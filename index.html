@@ -1,0 +1,2002 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ATPH Digital - SMKN 1 Labangka</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Custom Styling Configuration -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            emerald: {
+              850: '#064e3b',
+              950: '#022c22',
+            },
+            neutral: {
+              850: '#202020',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom Scrollbar for Agricultural Premium Look */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #171717;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #047857;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #059669;
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.25s ease-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-neutral-900 text-neutral-100 font-sans flex flex-col md:flex-row overflow-hidden">
+
+  <!-- --- SIDEBAR NAVIGATION (LEFT SECTION) --- -->
+  <aside id="sidebar" class="w-85 bg-neutral-950 border-r border-neutral-800 flex flex-col justify-between shrink-0 z-20 md:flex transition-all duration-300">
+    <div>
+      <!-- Brand Logo Header -->
+      <div class="p-6 border-b border-neutral-800 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center font-bold text-xl text-white shadow-lg shadow-emerald-900/30">
+            🌱
+          </div>
+          <div>
+            <h1 class="font-extrabold text-base tracking-tight text-emerald-400">ATPH Digital</h1>
+            <p class="text-[10px] text-neutral-400 font-medium">SMKN 1 Labangka</p>
+          </div>
+        </div>
+        <button onclick="toggleSidebar()" class="md:hidden text-neutral-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Navigation Items -->
+      <div class="p-4 space-y-1 overflow-y-auto max-h-[70vh]">
+        <p class="text-[10px] font-bold text-neutral-500 uppercase px-3 mb-2 tracking-wider">Navigasi Utama</p>
+        <nav id="nav-container" class="space-y-1"></nav>
+      </div>
+    </div>
+
+    <!-- Admin Status Control Panel -->
+    <div class="p-4 border-t border-neutral-800 bg-neutral-950">
+      <div class="bg-neutral-900/60 p-3 rounded-xl mb-4 border border-neutral-800">
+        <div class="flex justify-between items-center text-xs">
+          <span class="text-neutral-400">Status Sesi:</span>
+          <span id="admin-badge" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-neutral-700 text-neutral-300">
+            🟢 Tamu
+          </span>
+        </div>
+        <div id="admin-helper" class="mt-2 text-[10px] text-neutral-500">
+          Masuk sebagai admin untuk mengelola database.
+        </div>
+      </div>
+
+      <button id="auth-btn" onclick="toggleAdminAuth()" class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-amber-600 hover:bg-amber-500 text-neutral-950 transition-all font-bold text-xs">
+        <i data-lucide="lock" class="w-3.5 h-3.5"></i> Masuk Sebagai Admin
+      </button>
+    </div>
+  </aside>
+
+  <!-- --- MAIN WORKSPACE PAGE (RIGHT CONTAINER) --- -->
+  <div class="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+    
+    <!-- Top Global Header -->
+    <header class="bg-neutral-950/80 backdrop-blur-md border-b border-neutral-800 h-16 flex items-center justify-between px-6 shrink-0 z-10">
+      <div class="flex items-center gap-4">
+        <button onclick="toggleSidebar()" class="p-2 hover:bg-neutral-900 rounded-lg text-neutral-400 hover:text-white">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+        <div class="hidden sm:block">
+          <span class="text-xs text-neutral-400 uppercase tracking-widest font-mono">Platform Pembelajaran Agribisnis</span>
+          <h2 class="font-bold text-sm text-neutral-200">SMK Negeri 1 Labangka Sumbawa</h2>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span id="header-admin-indicator" class="hidden sm:flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-500 text-xs px-3 py-1 rounded-full font-semibold hidden">
+          <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Mode Admin Aktif
+        </span>
+        <div class="text-right text-xs">
+          <p class="font-bold text-emerald-400">ATPH DIGITAL HTML5</p>
+          <p class="text-[10px] text-neutral-500">Koneksi Enkripsi</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Scrollable Workspace Chassis -->
+    <main id="workspace" class="flex-1 overflow-y-auto bg-neutral-900/60 p-6"></main>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- MODALS OVERLAYS SYSTEM                      -->
+  <!-- ============================================ -->
+
+  <!-- 1. Custom Alert Dialog -->
+  <div id="alert-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-[99] hidden">
+    <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-sm overflow-hidden text-xs shadow-2xl animate-fade-in">
+      <div class="bg-emerald-800 text-white p-4 font-bold flex items-center justify-between">
+        <span id="alert-title">Notifikasi</span>
+        <button onclick="closeAlert()" class="text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div id="alert-message" class="p-6 text-neutral-200 text-sm leading-relaxed"></div>
+      <div class="p-4 bg-neutral-950 border-t border-neutral-800 text-right">
+        <button onclick="closeAlert()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-neutral-950 font-extrabold rounded-xl text-xs transition-colors">
+          Mengerti
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Custom Confirm Dialog -->
+  <div id="confirm-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-[99] hidden">
+    <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-sm overflow-hidden text-xs shadow-2xl animate-fade-in">
+      <div class="bg-red-900 text-white p-4 font-bold flex items-center justify-between">
+        <span id="confirm-title">Konfirmasi Tindakan</span>
+      </div>
+      <div id="confirm-message" class="p-6 text-neutral-200 text-sm leading-relaxed"></div>
+      <div class="p-4 bg-neutral-950 border-t border-neutral-800 flex gap-2 justify-end">
+        <button onclick="closeConfirm(false)" class="px-4 py-2 bg-neutral-850 hover:bg-neutral-800 text-neutral-350 font-bold rounded-xl text-xs">
+          Batal
+        </button>
+        <button onclick="closeConfirm(true)" class="px-4 py-2 bg-red-650 hover:bg-red-600 text-white font-extrabold rounded-xl text-xs">
+          Ya, Lanjutkan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Admin Login Auth Overlay -->
+  <div id="login-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-sm overflow-hidden text-xs animate-fade-in">
+      <div class="bg-emerald-800 text-white p-4 flex justify-between items-center">
+        <div class="flex items-center gap-1.5 font-bold">
+          <i data-lucide="lock" class="w-4 h-4"></i> Kredensial Akses Administrator
+        </div>
+        <button onclick="hideLoginModal()" class="text-white hover:text-neutral-300">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <form onsubmit="handleAdminLogin(event)" class="p-6 space-y-4">
+        <div>
+          <label class="block text-neutral-400 font-bold mb-1.5">Username</label>
+          <input type="text" id="login-username" required placeholder="admin" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-xs">
+        </div>
+        <div>
+          <label class="block text-neutral-400 font-bold mb-1.5">Password</label>
+          <input type="password" id="login-password" required placeholder="atph123" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-xs">
+        </div>
+        <div id="login-error" class="p-3 bg-red-950 text-red-400 border border-red-900 rounded-xl text-center font-bold hidden">
+          ⚠️ Username atau Password salah!
+        </div>
+        <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-neutral-950 font-black rounded-xl text-xs transition-colors">
+          Masuk Sistem
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. Dynamic Form Modal (Insert/Update) -->
+  <div id="form-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 overflow-y-auto hidden">
+    <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-lg overflow-hidden text-xs shadow-2xl animate-fade-in">
+      <div class="bg-emerald-800 text-white px-5 py-4 flex justify-between items-center">
+        <h4 id="form-title" class="font-extrabold text-sm uppercase">Kelola Data</h4>
+        <button onclick="closeFormModal()" class="p-1.5 hover:bg-emerald-700 rounded-lg text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <form id="dynamic-form" onsubmit="handleFormSubmit(event)" class="p-6 space-y-4">
+        <div id="form-fields-container" class="space-y-3"></div>
+        <div class="flex gap-3 pt-4 border-t border-neutral-800">
+          <button type="button" onclick="closeFormModal()" class="flex-1 py-3 bg-neutral-850 hover:bg-neutral-800 border border-neutral-850 text-neutral-350 font-bold rounded-xl text-xs">
+            Batal
+          </button>
+          <button type="submit" class="flex-1 py-3 bg-emerald-650 hover:bg-emerald-600 text-neutral-950 font-extrabold rounded-xl text-xs transition-colors">
+            Simpan Data
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. Export Document Modal Preview -->
+  <div id="export-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white text-neutral-900 rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl p-6 text-xs animate-fade-in">
+      <div class="flex justify-between items-center pb-4 border-b border-neutral-200 mb-4">
+        <div>
+          <h4 id="export-doc-title" class="font-extrabold text-sm uppercase text-emerald-800">Pratinjau Lembar Laporan Cetak</h4>
+          <p class="text-[10px] text-neutral-500">Format: Laporan Resmi Kelompok Kompetensi ATPH SMKN 1 Labangka</p>
+        </div>
+        <button onclick="closeExportModal()" class="text-neutral-500 hover:text-neutral-900 font-bold text-base">✕</button>
+      </div>
+
+      <div id="export-sheet-container" class="border border-neutral-300 p-6 rounded bg-neutral-50 max-h-[50vh] overflow-y-auto font-mono text-[10px]"></div>
+
+      <div class="flex gap-3 mt-4">
+        <button onclick="simulateExport('Excel')" class="flex-1 py-3 bg-emerald-700 hover:bg-emerald-600 text-white font-extrabold rounded-xl flex items-center justify-center gap-2">
+          📥 Unduh Format Excel (.xlsx)
+        </button>
+        <button onclick="simulateExport('PDF')" class="flex-1 py-3 bg-red-700 hover:bg-red-600 text-white font-extrabold rounded-xl flex items-center justify-center gap-2">
+          📥 Unduh Laporan PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Gallery Slideshow Modal -->
+  <div id="slideshow-modal" class="fixed inset-0 bg-black/95 z-50 flex flex-col justify-between p-6 hidden animate-fade-in">
+    <div class="flex justify-between items-center text-white">
+      <span id="slideshow-counter" class="text-xs font-mono">Slideshow</span>
+      <button onclick="closeSlideshow()" class="p-2 hover:bg-neutral-800 rounded-full text-white transition-colors">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+    </div>
+    <div class="flex-1 flex flex-col items-center justify-center space-y-4 max-w-4xl mx-auto w-full">
+      <img id="slideshow-img" src="" alt="Slideshow Image" class="max-h-[60vh] max-w-full object-contain rounded-2xl border border-neutral-800 shadow-2xl">
+      <div class="text-center space-y-1">
+        <span id="slideshow-category" class="text-[10px] bg-emerald-900 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-full font-bold uppercase tracking-widest"></span>
+        <h4 id="slideshow-title" class="text-xl font-bold text-white pt-2"></h4>
+        <p id="slideshow-date" class="text-xs text-neutral-400"></p>
+      </div>
+    </div>
+    <div class="flex justify-between gap-4 max-w-md mx-auto w-full">
+      <button id="prev-slide-btn" onclick="navigateSlide(-1)" class="flex-1 py-3 bg-neutral-900 border border-neutral-800 text-xs font-bold rounded-xl text-white hover:bg-neutral-800 transition-all">
+        Sebelumnya
+      </button>
+      <button id="next-slide-btn" onclick="navigateSlide(1)" class="flex-1 py-3 bg-emerald-600 text-neutral-950 text-xs font-extrabold rounded-xl hover:bg-emerald-500 transition-all">
+        Berikutnya
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- APPLICATION BUSINESS LOGIC & COMPONENT ENGINE -->
+  <!-- ============================================ -->
+  <script>
+    // --- DATABASE & STATE CHASSIS ---
+    const state = {
+      currentTab: 'dashboard',
+      isAdmin: false,
+      searchQuery: '',
+      filterClass: 'Semua',
+      galleryCategory: 'Semua',
+      scheduleDay: 'Senin',
+      
+      // Pre-populated local database mimicking SMKN 1 Labangka ATPH
+      students: [
+        { id: 's1', nisn: '005432101', nama: 'Ahmad Faisal', jk: 'Laki-laki', kelas: 'XII ATPH', ttl: 'Labangka, 12 Maret 2008', alamat: 'Sekaokat, Labangka', hp: '082345678901', ortu: 'Sulaeman', foto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=120' },
+        { id: 's2', nisn: '006543210', nama: 'Siti Nurhaliza', jk: 'Perempuan', kelas: 'XII ATPH', ttl: 'Sumbawa, 5 Juni 2008', alamat: 'Plampang', hp: '085311223344', ortu: 'Bahruddin', foto: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=120' },
+        { id: 's3', nisn: '007654321', nama: 'Budi Darmawan', jk: 'Laki-laki', kelas: 'XI ATPH', ttl: 'Labangka 1, 18 Agustus 2009', alamat: 'Labangka 1', hp: '081999888777', ortu: 'Kurniawan', foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=120' },
+        { id: 's4', nisn: '008765432', nama: 'Dewi Lestari', jk: 'Perempuan', kelas: 'X ATPH', ttl: 'Labangka 3, 22 September 2010', alamat: 'Labangka 3', hp: '087766554433', ortu: 'Aris Siswanto', foto: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=120' }
+      ],
+      teachers: [
+        { id: 't1', nip: '198503152010011002', nama: 'Supriadi, S.P.', mapel: 'Dasar Dasar Agronomi & Pembibitan', pendidikan: 'S1 Agroteknologi Universitas Mataram', hp: '081234567890', email: 'supriadi.atph@smk.sch.id', foto: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=150' },
+        { id: 't2', nip: '199008222015032004', nama: 'Rini Astuti, S.Pd.', mapel: 'Agribisnis Tanaman Hortikultura', pendidikan: 'S1 Pendidikan Biologi Universitas Hamzanwadi', hp: '087865432109', email: 'rini.atstuti@smk.sch.id', foto: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=150' },
+        { id: 't3', nip: '199311052020121003', nama: 'Zulkifli, S.Tr.P.', mapel: 'Agribisnis Tanaman Pangan & Alat Mesin Pertanian', pendidikan: 'D4 Politeknik Pertanian Negeri Pangkep', hp: '082334455667', email: 'zulkifli@smk.sch.id', foto: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150' }
+      ],
+      schedules: [
+        { id: 'sc1', hari: 'Senin', jam: '07.30 - 09.45', mapel: 'Dasar-Dasar Agronomi', kelas: 'X ATPH', guru: 'Supriadi, S.P.' },
+        { id: 'sc2', hari: 'Senin', jam: '10.00 - 12.15', mapel: 'Agribisnis Tanaman Hortikultura', kelas: 'XI ATPH', guru: 'Rini Astuti, S.Pd.' },
+        { id: 'sc3', hari: 'Selasa', jam: '07.30 - 11.30', mapel: 'Praktik Pembibitan Modern', kelas: 'XII ATPH', guru: 'Supriadi, S.P.' },
+        { id: 'sc4', hari: 'Rabu', jam: '08.00 - 11.00', mapel: 'Agribisnis Tanaman Pangan', kelas: 'XII ATPH', guru: 'Zulkifli, S.Tr.P.' },
+        { id: 'sc5', hari: 'Kamis', jam: '07.30 - 10.00', mapel: 'Pemupukan & Proteksi Tanaman', kelas: 'XI ATPH', guru: 'Rini Astuti, S.Pd.' },
+        { id: 'sc6', hari: 'Jumat', jam: '07.30 - 10.30', mapel: 'Lanskap & Pertamanan', kelas: 'XI ATPH', guru: 'Rini Astuti, S.Pd.' }
+      ],
+      activities: [
+        { id: 'ac1', judul: 'Praktik Pembibitan Cabai Rawit Unggul', tanggal: '2026-05-12', lokasi: 'Greenhouse SMKN 1 Labangka', deskripsi: 'Siswa XII ATPH melakukan praktik persiapan media semai and penanaman benih cabai rawit dengan metode tray semai modern.', pj: 'Ahmad Faisal (Ketua Kelas XII)', status: 'Disetujui', foto: 'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&q=80&w=400' },
+        { id: 'ac2', judul: 'Panen Raya Tanaman Padi Metode SRI', tanggal: '2026-05-20', lokasi: 'Sawah Praktik ATPH', deskripsi: 'Pemanenan padi varietas unggul yang ditanam siswa dengan metode System of Rice Intensification (SRI) guna menghemat air.', pj: 'Budi Darmawan', status: 'Disetujui', foto: 'https://images.unsplash.com/photo-1535254973040-607b474cb50d?auto=format&fit=crop&q=80&w=400' },
+        { id: 'ac3', judul: 'Penyemprotan Pestisida Organik pada Tomat', tanggal: '2026-06-02', lokasi: 'Lahan Hortikultura Terbuka', deskripsi: 'Aplikasi pestisida nabati buatan sendiri menggunakan ekstrak daun mimba dan serai wangi untuk mengatasi kutu kebul.', pj: 'Siti Nurhaliza', status: 'Menunggu Persetujuan', foto: 'https://images.unsplash.com/photo-1592417817098-8f3d6eb19675?auto=format&fit=crop&q=80&w=400' }
+      ],
+      gallery: [
+        { id: 'g1', judul: 'Penyemaian Benih Unggul', kategori: 'Pembibitan', tanggal: '2026-05-01', foto: 'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&q=80&w=400' },
+        { id: 'g2', judul: 'Perawatan Sistem Irigasi Tetes', kategori: 'Budidaya', tanggal: '2026-05-08', foto: 'https://images.unsplash.com/photo-1463123081488-729f551ee610?auto=format&fit=crop&q=80&w=400' },
+        { id: 'g3', judul: 'Panen Jagung Hibrida', kategori: 'Panen', tanggal: '2026-05-15', foto: 'https://images.unsplash.com/photo-1551893086-c0305f252640?auto=format&fit=crop&q=80&w=400' },
+        { id: 'g4', judul: 'Desain Taman Minimalis Sekolah', kategori: 'Pertamanan', tanggal: '2026-05-22', foto: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&q=80&w=400' },
+        { id: 'g5', judul: 'Kunjungan ke Balai Benih Pertanian Sumbawa', kategori: 'Kunjungan Industri', tanggal: '2026-05-28', foto: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=400' }
+      ],
+      news: [
+        { id: 'n1', judul: 'Pendaftaran Praktik Kerja Lapangan (PKL) Gelombang II', tanggal: '2026-06-05', isi: 'Diberitahukan kepada seluruh siswa Kelas XI ATPH bahwa pendaftaran PKL Gelombang II ke DU/DI mitra (Balai Penelitian Tanaman Sayuran dan Perkebunan) telah dibuka. Silakan kumpulkan berkas administrasi ke Koordinator PKL.', lampiran: 'Pedoman_PKL_ATPH_2026.pdf', foto: 'https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&q=80&w=400' },
+        { id: 'n2', judul: 'Lomba Desain Taman Kreatif Antar Kelas', tanggal: '2026-06-01', isi: 'Dalam rangka memperingati Dies Natalis SMKN 1 Labangka, Jurusan ATPH mengadakan Lomba Desain Taman Sekolah. Penilaian difokuskan pada pemanfaatan tanaman obat keluarga (TOGA) dan estetika lanskap.', lampiran: 'Ketentuan_Lomba_Taman.pdf', foto: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&q=80&w=400' }
+      ],
+      modules: [
+        { id: 'm1', judul: 'Modul Praktis Budidaya Tanaman Hortikultura Semusim', kategori: 'Hortikultura', format: 'PDF', ukuran: '4.2 MB', pengarang: 'Rini Astuti, S.Pd.' },
+        { id: 'm2', judul: 'Panduan Pembuatan Pupuk Kompos dan Bokashi Cair', kategori: 'Pemupukan', format: 'DOCX', ukuran: '2.8 MB', pengarang: 'Supriadi, S.P.' },
+        { id: 'm3', judul: 'Teknik Pembibitan Vegetatif: Okulasi, Cangkok, & Sambung', kategori: 'Pembibitan', format: 'PDF', ukuran: '5.1 MB', pengarang: 'Supriadi, S.P.' },
+        { id: 'm4', judul: 'Manajemen Lanskap dan Estetika Pertamanan Sekolah', kategori: 'Lanskap Pertamanan', format: 'PPT', ukuran: '12.4 MB', pengarang: 'Rini Astuti, S.Pd.' }
+      ],
+      videos: [
+        { id: 'v1', judul: 'Tutorial Membuat Pestisida Organik Ampuh', durasi: '12:45', sumber: 'YouTube ATPH SMKN 1 Labangka', url: 'https://www.youtube.com/watch?v=v1', thumbnail: 'https://images.unsplash.com/photo-1592417817098-8f3d6eb19675?auto=format&fit=crop&q=80&w=400' },
+        { id: 'v2', judul: 'Teknik Budidaya Melon Hidroponik Sistem NFT', durasi: '18:20', sumber: 'Dokumentasi Praktik ATPH', url: 'https://www.youtube.com/watch?v=v2', thumbnail: 'https://images.unsplash.com/photo-1463123081488-729f551ee610?auto=format&fit=crop&q=80&w=400' },
+        { id: 'v3', judul: 'Cara Sukses Okulasi Tanaman Buah Hortikultura', durasi: '10:15', sumber: 'Direktorat PSMK Pertanian', url: 'https://www.youtube.com/watch?v=v3', thumbnail: 'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&q=80&w=400' }
+      ],
+      aiMessages: [
+        { id: 'welcome', role: 'assistant', text: 'Halo! Saya Asisten AI ATPH Digital SMKN 1 Labangka Sumbawa. Saya siap mendampingi Anda belajar agronomi, budidaya hortikultura, sistem pengairan/pemupukan, teknik perlindungan tanaman, arsitektur lanskap, hingga membantu menyusun soal-soal tugas/ujian Anda. Apa yang ingin kita bahas?', timestamp: new Date() }
+      ],
+      aiLoading: false
+    };
+
+    // Current Slide Index for Gallery Slideshow
+    let slideshowIndex = 0;
+    // Callback reference for confirm dialog
+    let confirmCallback = null;
+
+    // --- MENUS CHASSIS DEFINITION ---
+    const navigationMenus = [
+      { id: 'dashboard', label: 'Dashboard Statistik', icon: 'layers' },
+      { id: 'students', label: 'Data Siswa (Max 100)', icon: 'users' },
+      { id: 'teachers', label: 'Data Guru Produktif', icon: 'graduation-cap' },
+      { id: 'schedule', label: 'Jadwal Pelajaran', icon: 'calendar' },
+      { id: 'activities', label: 'Jurnal Praktik Siswa', icon: 'compass' },
+      { id: 'gallery', label: 'Galeri Kegiatan', icon: 'image' },
+      { id: 'news', label: 'Berita Sekolah', icon: 'newspaper' },
+      { id: 'modules', label: 'Modul Pembelajaran', icon: 'book-open' },
+      { id: 'videos', label: 'Video Pembelajaran', icon: 'video' },
+      { id: 'about', label: 'Informasi Jurusan', icon: 'info' },
+      { id: 'ai-chat', label: 'Chat AI ATPH', icon: 'message-square', badge: 'Aktif' },
+      { id: 'contact', label: 'Kontak Jurusan', icon: 'phone' }
+    ];
+
+    // --- CUSTOM MODALS & ALERT DISPLACEMENT SYSTEM ---
+    function triggerAlert(title, message) {
+      document.getElementById('alert-title').innerText = title;
+      document.getElementById('alert-message').innerText = message;
+      document.getElementById('alert-modal').classList.remove('hidden');
+    }
+    function closeAlert() {
+      document.getElementById('alert-modal').classList.add('hidden');
+    }
+
+    function triggerConfirm(title, message, callback) {
+      document.getElementById('confirm-title').innerText = title;
+      document.getElementById('confirm-message').innerText = message;
+      document.getElementById('confirm-modal').classList.remove('hidden');
+      confirmCallback = callback;
+    }
+    function closeConfirm(isConfirmed) {
+      document.getElementById('confirm-modal').classList.add('hidden');
+      if (isConfirmed && confirmCallback) {
+        confirmCallback();
+      }
+      confirmCallback = null;
+    }
+
+    // --- SYSTEM SIDEBAR CONTROLLER ---
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('hidden');
+    }
+
+    // --- SYSTEM AUTH ADMINISTRATOR MANAGEMENT ---
+    function toggleAdminAuth() {
+      if (state.isAdmin) {
+        state.isAdmin = false;
+        document.getElementById('admin-badge').className = "px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-neutral-700 text-neutral-300";
+        document.getElementById('admin-badge').innerText = "🟢 Tamu";
+        document.getElementById('auth-btn').className = "w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-amber-600 hover:bg-amber-500 text-neutral-950 transition-all font-bold text-xs";
+        document.getElementById('auth-btn').innerHTML = `<i data-lucide="lock" class="w-3.5 h-3.5"></i> Masuk Sebagai Admin`;
+        document.getElementById('header-admin-indicator').classList.add('hidden');
+        document.getElementById('admin-helper').innerText = "Masuk sebagai admin untuk mengelola database.";
+        lucide.createIcons();
+        triggerAlert("Akses Dinonaktifkan", "Anda telah keluar dari mode administrator.");
+        renderActiveTab();
+      } else {
+        document.getElementById('login-username').value = '';
+        document.getElementById('login-password').value = '';
+        document.getElementById('login-error').classList.add('hidden');
+        document.getElementById('login-modal').classList.remove('hidden');
+      }
+    }
+
+    function hideLoginModal() {
+      document.getElementById('login-modal').classList.add('hidden');
+    }
+
+    function handleAdminLogin(event) {
+      event.preventDefault();
+      const u = document.getElementById('login-username').value;
+      const p = document.getElementById('login-password').value;
+
+      if (u.toLowerCase() === 'admin' && p === 'atph123') {
+        state.isAdmin = true;
+        document.getElementById('login-modal').classList.add('hidden');
+        document.getElementById('admin-badge').className = "px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-600 text-neutral-950";
+        document.getElementById('admin-badge').innerText = "🔴 Admin";
+        document.getElementById('auth-btn').className = "w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-red-950 hover:bg-red-900 text-red-200 transition-all font-bold text-xs border border-red-800/40";
+        document.getElementById('auth-btn').innerHTML = `<i data-lucide="log-out" class="w-3.5 h-3.5"></i> Keluar Mode Admin`;
+        document.getElementById('header-admin-indicator').classList.remove('hidden');
+        document.getElementById('admin-helper').innerText = "Akses kelola, hapus, & setujui jurnal aktif.";
+        lucide.createIcons();
+        triggerAlert("Berhasil Masuk", "Mode Administrator Jurusan ATPH SMKN 1 Labangka diaktifkan.");
+        renderActiveTab();
+      } else {
+        document.getElementById('login-error').classList.remove('hidden');
+      }
+    }
+
+    // --- NAVIGATION ENGINE RENDERING ---
+    function initializeSidebarMenus() {
+      const container = document.getElementById('nav-container');
+      container.innerHTML = navigationMenus.map(m => {
+        const hasBadge = m.badge ? `<span class="bg-emerald-400/20 text-emerald-400 text-[9px] px-2 py-0.5 rounded-full font-bold">${m.badge}</span>` : '';
+        return `
+          <button onclick="switchTab('${m.id}')" id="nav-btn-${m.id}" class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition-all text-sm font-semibold text-neutral-400 hover:bg-neutral-900 hover:text-white">
+            <div class="flex items-center gap-3">
+              <i data-lucide="${m.icon}" class="w-4 h-4"></i>
+              <span>${m.label}</span>
+            </div>
+            ${hasBadge}
+          </button>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function switchTab(tabId) {
+      state.currentTab = tabId;
+      state.searchQuery = ''; // Reset search on tab navigation
+      
+      // Update sidebar active visuals
+      navigationMenus.forEach(m => {
+        const btn = document.getElementById(`nav-btn-${m.id}`);
+        if (m.id === tabId) {
+          btn.className = "w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition-all text-sm font-semibold bg-emerald-800 text-white shadow-lg shadow-emerald-950/40 border-l-4 border-emerald-400";
+        } else {
+          btn.className = "w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition-all text-sm font-semibold text-neutral-400 hover:bg-neutral-900 hover:text-white";
+        }
+      });
+
+      renderActiveTab();
+      if (window.innerWidth < 768) {
+        toggleSidebar(); // Auto collapse on mobile
+      }
+    }
+
+    // --- MAIN RENDER ROUTER ---
+    function renderActiveTab() {
+      const workspace = document.getElementById('workspace');
+      workspace.innerHTML = ''; // Clear container
+
+      switch (state.currentTab) {
+        case 'dashboard':
+          renderDashboard(workspace);
+          break;
+        case 'students':
+          renderStudents(workspace);
+          break;
+        case 'teachers':
+          renderTeachers(workspace);
+          break;
+        case 'schedule':
+          renderSchedule(workspace);
+          break;
+        case 'activities':
+          renderActivities(workspace);
+          break;
+        case 'gallery':
+          renderGallery(workspace);
+          break;
+        case 'news':
+          renderNews(workspace);
+          break;
+        case 'modules':
+          renderModules(workspace);
+          break;
+        case 'videos':
+          renderVideos(workspace);
+          break;
+        case 'about':
+          renderAbout(workspace);
+          break;
+        case 'ai-chat':
+          renderAiChat(workspace);
+          break;
+        case 'contact':
+          renderContact(workspace);
+          break;
+      }
+      lucide.createIcons();
+    }
+
+    // ============================================
+    // WORKSPACE VIEWS RENDERERS
+    // ============================================
+
+    // 1. DASHBOARD VIEW
+    function renderDashboard(target) {
+      const newsItemHTML = state.news.length > 0 ? `
+        <div class="bg-neutral-900 p-4 rounded-xl border border-neutral-800/60 flex flex-col md:flex-row gap-4 animate-fade-in">
+          ${state.news[0].foto ? `<img src="${state.news[0].foto}" alt="Berita" class="w-full md:w-32 h-24 rounded-lg object-cover bg-neutral-950">` : ''}
+          <div class="flex-1">
+            <div class="flex justify-between items-center text-xs text-neutral-400">
+              <span>Diterbitkan: ${state.news[0].tanggal}</span>
+              <span class="bg-emerald-950/50 text-emerald-400 px-2 py-0.5 rounded text-[10px] font-bold">Utama</span>
+            </div>
+            <h5 class="font-bold text-base text-emerald-300 mt-2 leading-snug">${state.news[0].judul}</h5>
+            <p class="text-xs text-neutral-300 mt-2 leading-relaxed line-clamp-2">${state.news[0].isi}</p>
+          </div>
+        </div>
+      ` : `<p class="text-xs text-neutral-500 text-center py-6">Belum ada berita baru.</p>`;
+
+      const currentDaySchedules = state.schedules.filter(sc => sc.hari === state.scheduleDay);
+      const scheduleItemsHTML = currentDaySchedules.length > 0 ? `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 animate-fade-in">
+          ${currentDaySchedules.map(sc => `
+            <div class="bg-neutral-900 p-4 rounded-xl border border-neutral-800/40 flex justify-between items-center">
+              <div>
+                <span class="text-[9px] bg-emerald-950/50 text-emerald-400 border border-emerald-800/30 px-2.5 py-0.5 rounded-full font-bold uppercase">${sc.kelas}</span>
+                <p class="font-bold text-sm text-neutral-150 mt-2">${sc.mapel}</p>
+                <p class="text-[11px] text-neutral-400 mt-0.5">Guru: ${sc.guru}</p>
+              </div>
+              <span class="text-xs bg-neutral-950 px-3 py-1.5 rounded-lg border border-neutral-800 font-mono text-neutral-300 font-bold">${sc.jam}</span>
+            </div>
+          `).join('')}
+        </div>
+      ` : `<p class="text-xs text-neutral-500 text-center py-6">Tidak ada jadwal produktif pada hari ${state.scheduleDay}.</p>`;
+
+      target.innerHTML = `
+        <div class="space-y-6 animate-fade-in">
+          <!-- Jumbotron Hero Banner -->
+          <div class="relative rounded-2xl overflow-hidden bg-gradient-to-r from-emerald-900 via-emerald-800 to-emerald-950 p-8 text-white border border-emerald-700/30 shadow-xl">
+            <div class="absolute right-10 bottom-0 opacity-10 text-[180px] font-black select-none pointer-events-none">🌾</div>
+            <div class="relative z-10 max-w-2xl">
+              <span class="text-xs bg-emerald-500/20 border border-emerald-400/30 font-mono uppercase tracking-wider px-3 py-1 rounded-full text-emerald-300">
+                Sistem Digital Integrasi Pertanian
+              </span>
+              <h3 class="text-3xl font-extrabold mt-4 leading-tight">Maju Bersama Agribisnis Tanaman Pangan & Hortikultura</h3>
+              <p class="text-sm text-neutral-200 mt-2 leading-relaxed">
+                Pengelolaan mandiri untuk data siswa, penayangan jadwal pelajaran produktif, rekam jurnal praktik lapangan, serta asisten AI berkemampuan tinggi untuk meningkatkan kompetensi agropreneur masa depan di SMKN 1 Labangka.
+              </p>
+            </div>
+          </div>
+
+          <!-- Stats Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-neutral-950 p-5 rounded-2xl border border-neutral-800 flex items-center justify-between">
+              <div>
+                <p class="text-xs text-neutral-400 font-semibold uppercase tracking-wider">Total Siswa Terdaftar</p>
+                <p class="text-3xl font-black text-emerald-400 mt-2">${state.students.length} <span class="text-xs font-normal text-neutral-500">/ 100 Maks</span></p>
+              </div>
+              <div class="w-12 h-12 bg-neutral-900 rounded-xl flex items-center justify-center text-emerald-400 border border-neutral-800">
+                <i data-lucide="users" class="w-6 h-6"></i>
+              </div>
+            </div>
+            <div class="bg-neutral-950 p-5 rounded-2xl border border-neutral-800 flex items-center justify-between">
+              <div>
+                <p class="text-xs text-neutral-400 font-semibold uppercase tracking-wider">Guru Produktif</p>
+                <p class="text-3xl font-black text-emerald-400 mt-2">${state.teachers.length} <span class="text-xs font-normal text-neutral-500">Pengampu</span></p>
+              </div>
+              <div class="w-12 h-12 bg-neutral-900 rounded-xl flex items-center justify-center text-emerald-400 border border-neutral-800">
+                <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+              </div>
+            </div>
+            <div class="bg-neutral-950 p-5 rounded-2xl border border-neutral-800 flex items-center justify-between">
+              <div>
+                <p class="text-xs text-neutral-400 font-semibold uppercase tracking-wider">Praktik Lapangan (Disetujui)</p>
+                <p class="text-3xl font-black text-emerald-400 mt-2">${state.activities.filter(a => a.status === 'Disetujui').length} <span class="text-xs font-normal text-neutral-500">Jurnal</span></p>
+              </div>
+              <div class="w-12 h-12 bg-neutral-900 rounded-xl flex items-center justify-center text-emerald-400 border border-neutral-800">
+                <i data-lucide="compass" class="w-6 h-6"></i>
+              </div>
+            </div>
+            <div class="bg-neutral-950 p-5 rounded-2xl border border-neutral-800 flex items-center justify-between">
+              <div>
+                <p class="text-xs text-neutral-400 font-semibold uppercase tracking-wider">Aktivitas Menunggu Tindakan</p>
+                <p class="text-3xl font-black text-amber-500 mt-2">${state.activities.filter(a => a.status === 'Menunggu Persetujuan').length} <span class="text-xs font-normal text-neutral-500">Pengajuan</span></p>
+              </div>
+              <div class="w-12 h-12 bg-neutral-900 rounded-xl flex items-center justify-center text-amber-500 border border-neutral-800 animate-pulse">
+                <i data-lucide="clock" class="w-6 h-6"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Columns -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-8 space-y-6">
+              <!-- Berita Terkini -->
+              <div class="bg-neutral-950 p-6 rounded-2xl border border-neutral-800">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-neutral-900">
+                  <div class="flex items-center gap-2.5">
+                    <i data-lucide="newspaper" class="w-5 h-5 text-emerald-400"></i>
+                    <h4 class="font-bold text-sm uppercase tracking-wider">Berita Sekolah Terbaru</h4>
+                  </div>
+                  <button onclick="switchTab('news')" class="text-xs text-emerald-400 hover:underline">Semua Berita</button>
+                </div>
+                ${newsItemHTML}
+              </div>
+
+              <!-- Jadwal Harian -->
+              <div class="bg-neutral-950 p-6 rounded-2xl border border-neutral-800">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-neutral-900">
+                  <div class="flex items-center gap-2.5">
+                    <i data-lucide="calendar" class="w-5 h-5 text-emerald-400"></i>
+                    <h4 class="font-bold text-sm uppercase tracking-wider">Jadwal Harian (${state.scheduleDay})</h4>
+                  </div>
+                  <button onclick="switchTab('schedule')" class="text-xs text-emerald-400 hover:underline">Kelola Jadwal Mingguan</button>
+                </div>
+                <!-- Day Selectors -->
+                <div class="flex gap-1.5 mb-4 overflow-x-auto pb-1">
+                  ${['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'].map(d => `
+                    <button onclick="state.scheduleDay='${d}'; renderActiveTab();" class="px-4 py-2 text-xs font-bold rounded-xl transition-all ${state.scheduleDay === d ? 'bg-emerald-600 text-white' : 'bg-neutral-900 text-neutral-400 hover:text-white'}">
+                      ${d}
+                    </button>
+                  `).join('')}
+                </div>
+                ${scheduleItemsHTML}
+              </div>
+            </div>
+
+            <!-- Action column -->
+            <div class="lg:col-span-4 space-y-6">
+              <div class="bg-gradient-to-br from-indigo-950 via-neutral-950 to-indigo-950 p-6 rounded-2xl border border-indigo-900/40 text-center">
+                <div class="w-12 h-12 bg-indigo-600/20 rounded-full flex items-center justify-center text-indigo-400 mx-auto border border-indigo-700/30 mb-4 animate-pulse">
+                  <i data-lucide="sparkles" class="w-6 h-6"></i>
+                </div>
+                <h4 class="font-bold text-white text-base">Konsultasi AI Pertanian</h4>
+                <p class="text-xs text-indigo-300/80 mt-1 max-w-xs mx-auto leading-relaxed">
+                  Tanyakan penyakit tomat, dosis kompos, metode hidroponik, atau minta dibuatkan bank soal agronomi secara instan.
+                </p>
+                <button onclick="switchTab('ai-chat')" class="mt-4 w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 transition-all font-bold text-xs text-white">
+                  Buka Konsultasi Chat AI
+                </button>
+              </div>
+
+              <!-- System Information -->
+              <div class="bg-neutral-950 p-5 rounded-2xl border border-neutral-800 text-xs">
+                <h4 class="font-bold uppercase tracking-wider text-neutral-400 mb-3">Informasi Sistem</h4>
+                <div class="space-y-2.5">
+                  <div class="flex justify-between items-center py-1.5 border-b border-neutral-900">
+                    <span class="text-neutral-500">Database:</span>
+                    <span class="font-mono text-emerald-400 font-bold">In-Memory Engine</span>
+                  </div>
+                  <div className="flex justify-between items-center py-1.5 border-b border-neutral-900">
+                    <span class="text-neutral-500">Kapasitas Maksimal:</span>
+                    <span class="font-mono text-neutral-300 font-bold">100 Siswa</span>
+                  </div>
+                  <div class="flex justify-between items-center py-1.5 border-b border-neutral-900">
+                    <span class="text-neutral-500">Metode Upload:</span>
+                    <span class="font-mono text-neutral-300 font-semibold">Base64 FileReader</span>
+                  </div>
+                  <div class="flex justify-between items-center py-1.5">
+                    <span class="text-neutral-500">Model AI:</span>
+                    <span class="font-mono text-indigo-400 font-bold">Gemini 2.5 Flash</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // 2. DATA SISWA VIEW
+    function renderStudents(target) {
+      const filtered = state.students.filter(s => {
+        const matchesSearch = s.nama.toLowerCase().includes(state.searchQuery.toLowerCase()) || 
+                              s.nisn.includes(state.searchQuery) ||
+                              s.alamat.toLowerCase().includes(state.searchQuery.toLowerCase());
+        const matchesClass = state.filterClass === 'Semua' || s.kelas === state.filterClass;
+        return matchesSearch && matchesClass;
+      });
+
+      const addBtnHTML = state.isAdmin ? `
+        <button onclick="openFormModal('student', 'add')" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-neutral-950 font-extrabold text-xs px-4 py-2.5 rounded-xl transition-all">
+          <i data-lucide="plus" class="w-4 h-4"></i> Tambah Siswa Baru
+        </button>
+      ` : '';
+
+      target.innerHTML = `
+        <div class="space-y-6 animate-fade-in">
+          <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <div>
+              <h3 class="text-2xl font-black text-neutral-100">Database Siswa Jurusan</h3>
+              <p class="text-sm text-neutral-400 mt-1">Kuota Terdaftar: ${state.students.length} / 100 Siswa Maksimal</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="openExportPreview('student')" class="flex items-center gap-2 bg-neutral-950 hover:bg-neutral-900 border border-neutral-800 text-emerald-400 font-bold text-xs px-4 py-2.5 rounded-xl transition-all">
+                <i data-lucide="download" class="w-4 h-4"></i> Cetak Laporan / Ekspor
+              </button>
+              ${addBtnHTML}
+            </div>
+          </div>
+
+          <!-- Filters -->
+          <div class="flex flex-col sm:flex-row gap-3 bg-neutral-950 p-4 rounded-xl border border-neutral-800">
+            <div class="relative flex-1">
+              <i data-lucide="search" class="absolute left-3 top-3 w-4 h-4 text-neutral-500"></i>
+              <input type="text" id="student-search" oninput="handleSearch(event)" placeholder="Cari berdasarkan Nama, NISN, Alamat..." value="${state.searchQuery}" class="w-full bg-neutral-900 pl-10 pr-4 py-2.5 text-xs rounded-xl border border-neutral-800 text-white placeholder-neutral-500 focus:outline-none focus:border-emerald-500">
+            </div>
+            <div class="flex items-center gap-2 overflow-x-auto">
+              <span class="text-xs text-neutral-500 whitespace-nowrap">Filter Kelas:</span>
+              ${['Semua', 'X ATPH', 'XI ATPH', 'XII ATPH'].map(cls => `
+                <button onclick="state.filterClass='${cls}'; renderActiveTab();" class="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${state.filterClass === cls ? 'bg-emerald-600 text-white shadow-md' : 'bg-neutral-900 text-neutral-400 border border-neutral-800'}">
+                  ${cls}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Students Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            ${filtered.length > 0 ? filtered.map(s => `
+              <div class="bg-neutral-950 p-5 rounded-2xl border border-neutral-800 hover:border-emerald-700/50 transition-all flex gap-4">
+                <img src="${s.foto}" alt="${s.nama}" class="w-20 h-24 rounded-xl object-cover bg-neutral-900 border border-neutral-800" onerror="this.src='https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=120'">
+                <div class="flex-1 min-w-0 flex flex-col justify-between">
+                  <div>
+                    <div class="flex justify-between items-start">
+                      <span class="text-[9px] bg-emerald-950/80 text-emerald-400 px-2 py-0.5 rounded-full font-bold uppercase">${s.kelas}</span>
+                      <span class="text-[10px] text-neutral-500 font-mono">NISN: ${s.nisn}</span>
+                    </div>
+                    <h4 class="font-bold text-white text-base mt-1 line-clamp-1">${s.nama}</h4>
+                    <p class="text-[11px] text-neutral-400 mt-1">Ortu: <span class="text-neutral-300 font-medium">${s.ortu}</span></p>
+                    <p class="text-[11px] text-neutral-400">Domisili: <span class="text-neutral-300 font-medium">${s.alamat}</span></p>
+                  </div>
+                  <div class="flex justify-between items-center pt-2 mt-2 border-t border-neutral-900">
+                    <span class="text-[11px] text-emerald-400 font-semibold">${s.hp}</span>
+                    ${state.isAdmin ? `
+                      <div class="flex gap-1">
+                        <button onclick="openFormModal('student', 'edit', '${s.id}')" class="p-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-lg text-amber-500">
+                          <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button onclick="executeDelete('student', '${s.id}')" class="p-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-lg text-red-500">
+                          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                      </div>
+                    ` : ''}
+                  </div>
+                </div>
+              </div>
+            `).join('') : '<p class="col-span-full text-xs text-neutral-500 text-center py-10">Data siswa tidak ditemukan.</p>'}
+          </div>
+        </div>
+      `;
+    }
+
+    // 3. DATA GURU VIEW
+    function renderTeachers(target) {
+      const filtered = state.teachers.filter(t => 
+        t.nama.toLowerCase().includes(state.searchQuery.toLowerCase()) || 
+        t.mapel.toLowerCase().includes(state.searchQuery.toLowerCase()) || 
+        t.nip.includes(state.searchQuery)
+      );
+
+      const addBtnHTML = state.isAdmin ? `
+        <button onclick="openFormModal('teacher', 'add')" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-neutral-950 font-extrabold text-xs px-4 py-2.5 rounded-xl transition-all">
+          <i data-lucide="plus" class="w-4 h-4"></i> Tambah Guru Baru
+        </button>
+      ` : '';
+
+      target.innerHTML = `
+        <div class="space-y-6 animate-fade-in">
+          <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <div>
+              <h3 class="text-2xl font-black text-neutral-100">Dosen & Guru Produktif ATPH</h3>
+              <p class="text-sm text-neutral-400 mt-1">Pengampu keahlian budidaya praktis, mekanisasi, dan tata taman.</p>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="openExportPreview('teacher')" class="flex items-center gap-2 bg-neutral-950 hover:bg-neutral-900 border border-neutral-800 text-emerald-400 font-bold text-xs px-4 py-2.5 rounded-xl transition-all">
+                <i data-lucide="download" class="w-4 h-4"></i> Cetak Laporan
+              </button>
+              ${addBtnHTML}
+            </div>
+          </div>
+
+          <div class="relative bg-neutral-950 p-4 rounded-xl border border-neutral-800">
+            <i data-lucide="search" class="absolute left-7 top-7 w-4 h-4 text-neutral-500"></i>
+            <input type="text" oninput="handleSearch(event)" placeholder="Cari guru berdasarkan Nama, Mata Pelajaran, NIP..." value="${state.searchQuery}" class="w-full bg-neutral-900 pl-12 pr-4 py-2.5 text-xs rounded-xl border border-neutral-800 text-white placeholder-neutral-500 focus:outline-none focus:border-emerald-500">
+          </div>
+
+          <!-- Teachers Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            ${filtered.map(t => `
+              <div class="bg-neutral-950 p-6 rounded-2xl border border-neutral-800 flex flex-col sm:flex-row gap-6 relative overflow-hidden hover:border-emerald-700/40 transition-all animate-fade-in">
+                <img src="${t.foto}" alt="${t.nama}" class="w-28 h-36 rounded-xl object-cover bg-neutral-900 border border-neutral-800 shadow" onerror="this.src='https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=150'">
+                <div class="flex-1 min-w-0 flex flex-col justify-between space-y-4">
+                  <div>
+                    <span class="text-[9px] bg-emerald-950 text-emerald-400 border border-emerald-800/40 px-2.5 py-1 rounded-md font-bold uppercase tracking-wider">${t.mapel}</span>
+                    <h4 class="font-extrabold text-white text-lg mt-2">${t.nama}</h4>
+                    <p class="text-[10px] text-neutral-500 font-mono mt-0.5">NIP: ${t.nip}</p>
+                  </div>
+                  <div class="pt-3 border-t border-neutral-900 text-xs text-neutral-400 space-y-1">
+                    <p>🎓 <span class="text-neutral-300 font-semibold">Pendidikan:</span> ${t.pendidikan}</p>
+                    <p>📞 <span class="text-neutral-300 font-semibold">WhatsApp:</span> ${t.hp}</p>
+                    <p>✉️ <span class="text-neutral-300 font-semibold">Surel:</span> ${t.email}</p>
+                  </div>
+                </div>
+                ${state.isAdmin ? `
+                  <div class="absolute top-4 right-4 flex gap-1.5">
+                    <button onclick="openFormModal('teacher', 'edit', '${t.id}')" class="p-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded text-amber-500">
+                      <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button onclick="executeDelete('teacher', '${t.id}')" class="p-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded text-red-500">
+                      <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    </button>
+                  </div>
+                ` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // 4. JADWAL PELAJARAN VIEW
+    function renderSchedule(target) {
+      const daySchedules = state.schedules.filter(sc => sc.hari === state.scheduleDay);
+      const addBtnHTML = state.isAdmin ? `
+        <button onclick="openFormModal('schedule', 'add')" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-neutral-950 font-extrabold text-xs px-4 py-2.5 rounded-xl transition-all">
+          <i data-lucide="plus" class="w-4 h-4"></i> Tambah Slot Mengajar
+        </button>
+      ` : '';
+
+      target.innerHTML = `
+        <div class="space-y-6 animate-fade-in">
+          <div class="flex justify-between items-center">
+            <div>
+              <h3 class="text-2xl font-black text-neutral-100">Kalender & Jadwal Pelajaran</h3>
+              <p class="text-sm text-neutral-400 mt-1">Pembagian waktu dan mata diklat keahlian ATPH.</p>
+            </div>
+            ${addBtnHTML}
+          </div>
+
+          <!-- Day Selection -->
+          <div class="grid grid-cols-5 gap-2 bg-neutral-950 p-2 rounded-2xl border border-neutral-800">
+            ${['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'].map(d => `
+              <button onclick="state.scheduleDay='${d}'; renderActiveTab();" class="py-3 rounded-xl text-xs font-bold transition-all text-center ${state.scheduleDay === d ? 'bg-emerald-600 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}">
+                ${d}
+              </button>
+            `).join('')}
+          </div>
+
+          <!-- Schedule Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            ${daySchedules.length > 0 ? daySchedules.map(sc => `
+              <div class="bg-neutral-950 p-5 rounded-2xl border border-neutral-800 flex justify-between items-start relative animate-fade-in">
+                <div class="space-y-2">
+                  <span class="text-[9px] bg-emerald-950 text-emerald-400 border border-emerald-800/30 font-bold px-3 py-1 rounded-full uppercase">${sc.kelas}</span>
+                  <h4 class="font-extrabold text-white text-base pt-2">${sc.mapel}</h4>
+                  <p class="text-xs text-neutral-400">Guru Pengajar: <span class="text-neutral-200 font-semibold">${sc.guru}</span></p>
+                </div>
+                <div class="text-right flex flex-col items-end justify-between h-full min-h-[80px]">
+                  <span class="text-xs bg-neutral-900 px-3 py-1.5 rounded-xl border border-neutral-800 font-mono text-neutral-300 font-bold">${sc.jam}</span>
+                  ${state.isAdmin ? `
+                    <div class="flex gap-1">
+                      <button onclick="openFormModal('schedule', 'edit', '${sc.id}')" class="p-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded text-amber-500">
+                        <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+                      </button>
+                      <button onclick="executeDelete('schedule', '${sc.id}')" class="p-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded text-red-500">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                      </button>
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+            `).join('') : '<p class="col-span-full text-xs text-neutral-500 text-center py-10">Tidak ada jadwal pengajaran pada hari ' + state.scheduleDay + '.</p>'}
+          </div>
+        </div>
+      `;
+    }
+
+    // 5. KEGIATAN SISWA VIEW
+    function renderActivities(target) {
+      target.innerHTML = `
+        <div class="space-y-6 animate-fade-in">
+          <div class="flex justify-between items-center">
+            <div>
+              <h3 class="text-2xl font-black text-neutral-100">Jurnal Praktik Lapangan Siswa</h3>
+              <p class="text-sm text-neutral-400 mt-1">Siswa dapat mengunggah jurnal kegiatan. Verifikasi dilakukan oleh kepala jurusan.</p>
+            </div>
+            <button onclick="openFormModal('activity', 'add')" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-neutral-950 font-extrabold text-xs px-4 py-2.5 rounded-xl transition-all">
+              <i data-lucide="plus" class="w-4 h-4"></i> Tulis & Unggah Jurnal
+            </button>
+          </div>
+
+          <!-- Activities Feed -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            ${state.activities.map(ac => {
+              // Hide unapproved from normal users
+              if (!state.isAdmin && ac.status !== 'Disetujui') return '';
+
+              return `
+                <div class="bg-neutral-950 rounded-2xl overflow-hidden border border-neutral-800/80 hover:border-emerald-800/40 transition-all flex flex-col justify-between animate-fade-in">
+                  ${state.isAdmin ? `
+                    <div class="bg-neutral-900 px-5 py-3 border-b border-neutral-800 flex justify-between items-center text-xs">
+                      <div class="flex items-center gap-2">
+                        <span class="text-neutral-400 font-semibold">Konfirmasi Status:</span>
+                        <span class="px-2.5 py-0.5 rounded-full font-bold border ${ac.status === 'Disetujui' ? 'bg-emerald-950 text-emerald-400 border-emerald-800' : ac.status === 'Menunggu Persetujuan' ? 'bg-amber-950 text-amber-500 border-amber-800 animate-pulse' : 'bg-red-950 text-red-400 border-red-800'}">
+                          ${ac.status}
+                        </span>
+                      </div>
+                      <div class="flex gap-1">
+                        <button onclick="approveActivity('${ac.id}', 'Disetujui')" class="p-1 bg-emerald-650 hover:bg-emerald-600 text-neutral-950 font-bold rounded text-xs flex items-center gap-1">
+                          <i data-lucide="check" class="w-3.5 h-3.5"></i> Setuju
+                        </button>
+                        <button onclick="approveActivity('${ac.id}', 'Ditolak')" class="p-1 bg-red-900 hover:bg-red-800 text-red-100 font-bold rounded text-xs flex items-center gap-1">
+                          <i data-lucide="x" class="w-3.5 h-3.5"></i> Tolak
+                        </button>
+                      </div>
+                    </div>
+                  ` : ''}
+
+                  <div class="p-6 space-y-4">
+                    <div class="flex gap-4">
+                      <img src="${ac.foto}" alt="${ac.judul}" class="w-24 h-24 rounded-xl object-cover bg-neutral-900 border border-neutral-800 shadow" onerror="this.src='https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&q=80&w=400'">
+                      <div class="flex-1">
+                        <h4 class="font-extrabold text-white text-base leading-tight">${ac.judul}</h4>
+                        <p class="text-[11px] text-neutral-400 mt-1">📅 ${ac.tanggal} | 📍 ${ac.lokasi}</p>
+                        <p class="text-xs text-neutral-300 mt-2 line-clamp-3 leading-relaxed">${ac.deskripsi}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="bg-neutral-900/40 px-6 py-3 border-t border-neutral-900 flex justify-between items-center text-xs text-neutral-400">
+                    <span>Penulis: <span class="font-bold text-neutral-200">${ac.pj}</span></span>
+                    ${state.isAdmin ? `
+                      <button onclick="executeDelete('activity', '${ac.id}')" class="text-red-500 hover:text-red-400 p-1">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                      </button>
+                    ` : ''}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // 6. GALERI KEGIATAN VIEW
+    function renderGallery(target) {
+      const filtered = state.gallery.filter(g => state.galleryCategory === 'Semua' || g.kategori === state.galleryCategory);
+      const addBtnHTML = state.isAdmin ? `
+        <button onclick="openFormModal('gallery', 'add')" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-neutral-950 font-extrabold text-xs px-4 py-2.5 rounded-xl transition-all">
+          <i data-lucide="plus" class="w-4 h-4"></i> Unggah Foto Galeri
+        </button>
+      ` : '';
+
+      target.innerHTML = `
+        <div class="space-y-6 animate-fade-in">
+          <div class="flex justify-between items-center">
+            <div>
+              <h3 class="text-2xl font-black text-neutral-100">Galeri Hasil Tani & Kegiatan</h3>
+              <p class="text-sm text-neutral-400 mt-1">Etalase dokumentasi panen, pertamanan, pembibitan, dan budidaya tanaman.</p>
+            </div>
+            ${addBtnHTML}
+          </div>
+
+          <!-- Category filter scroll -->
+          <div class="flex gap-2 overflow-x-auto bg-neutral-950 p-2 rounded-2xl border border-neutral-800">
+            ${['Semua', 'Budidaya', 'Pembibitan', 'Panen', 'Pertamanan', 'Kunjungan Industri'].map(cat => `
+              <button onclick="state.galleryCategory='${cat}'; renderActiveTab();" class="px-4 py-2 text-xs font-bold rounded-xl transition-all whitespace-nowrap ${state.galleryCategory === cat ? 'bg-emerald-600 text-white' : 'bg-neutral-900 text-neutral-400 hover:text-white'}">
+                ${cat}
+              </button>
+            `).join('')}
+          </div>
+
+          <!-- Grid Images -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            ${filtered.map((g, index) => `
+              <div onclick="openSlideshow(${index})" class="bg-neutral-950 rounded-2xl overflow-hidden border border-neutral-800 cursor-pointer group hover:border-emerald-700 transition-all flex flex-col justify-between animate-fade-in">
+                <div class="h-48 bg-neutral-900 relative overflow-hidden flex items-center justify-center border-b border-neutral-900">
+                  <img src="${g.foto}" alt="${g.judul}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://images.unsplash.com/photo-1463123081488-729f551ee610?auto=format&fit=crop&q=80&w=400'">
+                  <div class="absolute top-3 left-3 bg-neutral-950/80 backdrop-blur-md text-emerald-400 px-3 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider">
+                    ${g.kategori}
+                  </div>
+                </div>
+                <div class="p-4 flex justify-between items-center">
+                  <div>
+                    <h4 class="font-bold text-white text-sm line-clamp-1">${g.judul}</h4>
+                    <p class="text-[10px] text-neutral-500 mt-0.5">Tanggal: ${g.tanggal}</p>
+                  </div>
+                  <i data-lucide="chevron-right" class="w-5 h-5 text-neutral-500 group-hover:text-emerald-400 transition-colors"></i>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // 7. BERITA SEKOLAH VIEW
+    function renderNews(target) {
+      const addBtnHTML = state.isAdmin ? `
+        <button onclick="openFormModal('news', 'add')" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-neutral-950 font-extrabold text-xs px-4 py-2.5 rounded-xl transition-all">
+          <i data-lucide="plus" class="w-4 h-4"></i> Tambah Berita
+        </button>
+      ` : '';
+
+      target.innerHTML = `
+        <div class="space-y-6 animate-fade-in">
+          <div class="flex justify-between items-center">
+            <div>
+              <h3 class="text-2xl font-black text-neutral-100">Berita Sekolah ATPH</h3>
+              <p class="text-sm text-neutral-400 mt-1">Liputan kabar berita, prestasi jurusan, PKL, dan agenda teranyar sekolah.</p>
+            </div>
+            ${addBtnHTML}
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            ${state.news.map(an => `
+              <div class="bg-neutral-950 rounded-2xl overflow-hidden border border-neutral-800 flex flex-col justify-between hover:border-emerald-800/40 transition-all animate-fade-in">
+                <!-- Header Image -->
+                <div class="h-48 w-full bg-neutral-900 relative">
+                  <img src="${an.foto}" alt="${an.judul}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=400'">
+                  <div class="absolute top-4 left-4 bg-emerald-900/95 backdrop-blur-md text-emerald-300 border border-emerald-700/30 px-3 py-1 rounded-xl text-[10px] font-bold">
+                    Berita ATPH
+                  </div>
+                </div>
+
+                <div class="p-6 space-y-3 flex-1 flex flex-col justify-between">
+                  <div>
+                    <div class="flex justify-between items-center text-[10px] text-neutral-500 font-mono">
+                      <span>📅 ${an.tanggal}</span>
+                      ${state.isAdmin ? `
+                        <div class="flex gap-1.5">
+                          <button onclick="openFormModal('news', 'edit', '${an.id}')" class="p-1 hover:bg-neutral-900 rounded text-amber-500">
+                            <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+                          </button>
+                          <button onclick="executeDelete('news', '${an.id}')" class="p-1 hover:bg-neutral-900 rounded text-red-500">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                          </button>
+                        </div>
+                      ` : ''}
+                    </div>
+                    <h4 class="font-extrabold text-lg text-emerald-300 mt-2 leading-snug line-clamp-2">${an.judul}</h4>
+                    <p class="text-neutral-300 text-xs mt-3 leading-relaxed line-clamp-3">${an.isi}</p>
+                  </div>
+
+                  ${an.lampiran ? `
+                    <div class="pt-4 border-t border-neutral-900 mt-4 flex justify-between items-center">
+                      <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-neutral-900 border border-neutral-800 text-[10px] text-emerald-400 font-bold cursor-pointer hover:bg-neutral-850">
+                        <i data-lucide="file-text" class="w-4 h-4"></i> ${an.lampiran}
+                      </span>
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // 8. MODUL PEMBELAJARAN VIEW
+    function renderModules(target) {
+      target.innerHTML = `
+        <div class="space-y-6 animate-fade-in">
+          <div>
+            <h3 class="text-2xl font-black text-neutral-100">Modul Belajar Mandiri</h3>
+            <p class="text-sm text-neutral-400 mt-1">Daftar buku panduan praktis, materi teori presisi, & presentasi pengajaran.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            ${state.modules.map(mod => `
+              <div class="bg-neutral-950 p-4 rounded-2xl border border-neutral-800 flex items-center justify-between hover:border-emerald-800 transition-colors animate-fade-in">
+                <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 bg-neutral-900 border border-neutral-800 rounded-xl flex flex-col items-center justify-center font-bold text-emerald-400 text-xs shrink-0">
+                    <span>${mod.format}</span>
+                  </div>
+                  <div>
+                    <span class="text-[8px] bg-emerald-950 text-emerald-400 font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">${mod.kategori}</span>
+                    <h4 class="font-bold text-white text-sm mt-1">${mod.judul}</h4>
+                    <p class="text-[10px] text-neutral-500 mt-0.5">Penulis: ${mod.pengarang} | Ukuran: ${mod.ukuran}</p>
+                  </div>
+                </div>
+
+                <button onclick="triggerAlert('Unduhan Berhasil', 'Berkas ${mod.judul}.${mod.format.toLowerCase()} berhasil diunduh.')" class="p-3 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-xl text-emerald-400 transition-colors flex items-center justify-center">
+                  <i data-lucide="download" class="w-4 h-4"></i>
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // 9. VIDEO PEMBELAJARAN VIEW
+    function renderVideos(target) {
+      target.innerHTML = `
+        <div class="space-y-6 animate-fade-in">
+          <div>
+            <h3 class="text-2xl font-black text-neutral-100">Video Edukasi Keahlian</h3>
+            <p class="text-sm text-neutral-400 mt-1">Media audio-visual mengenai praktik okulasi, fertigasi, dan pemupukan modern.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            ${state.videos.map(v => `
+              <div class="bg-neutral-950 rounded-2xl overflow-hidden border border-neutral-800 text-xs flex flex-col justify-between animate-fade-in">
+                <div class="h-44 bg-neutral-900 relative flex items-center justify-center text-5xl cursor-pointer group">
+                  <img src="${v.thumbnail}" alt="${v.judul}" class="w-full h-full object-cover group-hover:scale-105 transition-transform" onerror="this.src='https://images.unsplash.com/photo-1592417817098-8f3d6eb19675?auto=format&fit=crop&q=80&w=400'">
+                  <div class="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-colors flex items-center justify-center">
+                    <div class="w-12 h-12 bg-emerald-600/90 group-hover:bg-emerald-500 text-neutral-950 font-bold rounded-full flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-all text-sm pl-0.5">
+                      ▶
+                    </div>
+                  </div>
+                  <span class="absolute bottom-3 right-3 bg-neutral-950/80 backdrop-blur-md px-2.5 py-1 rounded text-[10px] text-white font-mono font-bold">${v.durasi}</span>
+                </div>
+
+                <div class="p-4 space-y-2">
+                  <h4 class="font-bold text-white text-sm line-clamp-2 leading-snug">${v.judul}</h4>
+                  <div class="flex justify-between items-center text-[10px] text-neutral-500 pt-2 border-t border-neutral-900">
+                    <span>Sumber: ${v.sumber}</span>
+                    <button onclick="triggerAlert('Membuka Youtube', 'Mengarahkan ke tautan video: ${v.judul}')" class="text-emerald-400 hover:underline">Tonton</button>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // 10. INFORMASI JURUSAN VIEW
+    function renderAbout(target) {
+      target.innerHTML = `
+        <div class="space-y-6 animate-fade-in">
+          <!-- Profile Card -->
+          <div class="bg-neutral-950 p-6 rounded-2xl border border-neutral-800 flex flex-col lg:flex-row gap-6 items-center">
+            <span class="text-7xl p-6 bg-neutral-900 border border-neutral-800 rounded-2xl">🌾</span>
+            <div class="text-center lg:text-left space-y-2">
+              <h4 class="text-xl font-bold text-emerald-400">Agribisnis Tanaman Pangan & Hortikultura (ATPH)</h4>
+              <p class="text-xs text-neutral-500 font-mono">KOMPETENSI UNGGULAN SMKN 1 LABANGKA</p>
+              <p class="text-neutral-300 text-sm leading-relaxed max-w-4xl text-justify">
+                Program Keahlian Agribisnis Tanaman Pangan dan Hortikultura SMKN 1 Labangka mendidik para siswa menjadi calon wirausahawan pertanian terampil, mandiri, dan berwawasan agribisnis industri berkelanjutan. Melalui pembelajaran praktik langsung di 3 hektar lahan sawah sekolah, kebun hortikultura horti-park, laboratorium pembibitan kultur jaringan, serta teknologi rumah hijau (*greenhouse*) pengairan tetes presisi.
+              </p>
+            </div>
+          </div>
+
+          <!-- Visi Misi -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-neutral-950 p-6 rounded-2xl border border-neutral-800 space-y-3">
+              <h5 class="font-extrabold text-emerald-300 border-b border-neutral-900 pb-2 flex items-center gap-2">
+                <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i> Visi Keahlian
+              </h5>
+              <p class="text-neutral-300 text-sm leading-relaxed italic pt-2">
+                "Menjadi pusat pendidikan vokasi agribisnis tanaman terkemuka di Nusa Tenggara Barat yang menghasilkan lulusan mandiri, kompeten, berkarakter agropreneur tangguh, dan ramah lingkungan pada tahun 2030."
+              </p>
+            </div>
+
+            <div class="bg-neutral-950 p-6 rounded-2xl border border-neutral-800 space-y-3">
+              <h5 class="font-extrabold text-emerald-300 border-b border-neutral-900 pb-2 flex items-center gap-2">
+                <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i> Misi Keahlian
+              </h5>
+              <ul class="list-decimal pl-5 text-neutral-300 text-xs space-y-2 pt-2">
+                <li>Menyelenggarakan proses pembelajaran vokasi berbasis teknologi pertanian digital presisi.</li>
+                <li>Mengembangkan unit produksi sekolah (*Teaching Factory*) untuk komoditas benih cabai, melon, dan beras SRI.</li>
+                <li>Menyelaraskan kurikulum kompetensi dengan dunia usaha pertanian modern.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // 11. CHAT AI ATPH
+    function renderAiChat(target) {
+      const messagesHTML = state.aiMessages.map(m => `
+        <div class="flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}">
+          <div class="max-w-2xl rounded-2xl px-5 py-3.5 text-sm leading-relaxed ${m.role === 'user' ? 'bg-indigo-600 text-white rounded-br-none shadow-md' : 'bg-neutral-900 text-neutral-200 rounded-bl-none border border-neutral-800'}">
+            <div class="whitespace-pre-wrap select-text">${m.text}</div>
+          </div>
+          <span class="text-[10px] text-neutral-500 mt-1 px-1">
+            ${new Date(m.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+          </span>
+        </div>
+      `).join('');
+
+      const loadingHTML = state.aiLoading ? `
+        <div class="flex items-center gap-2 text-indigo-400 font-semibold animate-pulse text-xs">
+          <div class="flex space-x-1.5">
+            <div class="w-2.5 h-2.5 bg-indigo-500 rounded-full animate-bounce"></div>
+            <div class="w-2.5 h-2.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:0.2s]"></div>
+            <div class="w-2.5 h-2.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:0.4s]"></div>
+          </div>
+          <span>AI sedang merangkum penjelasan...</span>
+        </div>
+      ` : '';
+
+      target.innerHTML = `
+        <div class="bg-neutral-950 rounded-2xl border border-neutral-800 overflow-hidden flex flex-col h-[75vh] animate-fade-in">
+          <!-- Inner Header -->
+          <div class="bg-indigo-950/40 p-4 border-b border-neutral-800/80 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-indigo-600/20 flex items-center justify-center text-indigo-400 border border-indigo-800/50">
+                <i data-lucide="sparkles" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h4 class="font-extrabold text-white text-sm">Konsultasi AI ATPH Assistant</h4>
+                <p class="text-[10px] text-indigo-300">Ditenagai oleh Gemini 2.5 Flash Engine</p>
+              </div>
+            </div>
+            <button onclick="resetAiChat()" class="text-xs text-indigo-300 bg-indigo-950 border border-indigo-800 px-3 py-1.5 rounded-xl hover:bg-indigo-900/60">
+              Reset Obrolan
+            </button>
+          </div>
+
+          <!-- Chat messages area -->
+          <div id="chat-messages-container" class="flex-1 overflow-y-auto p-6 space-y-4">
+            ${messagesHTML}
+            ${loadingHTML}
+            <div id="chat-end"></div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="px-6 py-2.5 bg-neutral-900 border-t border-neutral-800/80 flex items-center gap-2 overflow-x-auto whitespace-nowrap">
+            <button onclick="triggerQuickAi('Buat 5 Soal PG')" class="text-[10px] bg-indigo-950 hover:bg-indigo-900 text-indigo-300 font-extrabold px-3 py-2 rounded-xl border border-indigo-800/30 shrink-0 transition-colors">⚡ Buat 5 Soal PG</button>
+            <button onclick="triggerQuickAi('Wereng Coklat')" class="text-[10px] bg-indigo-950 hover:bg-indigo-900 text-indigo-300 font-extrabold px-3 py-2 rounded-xl border border-indigo-800/30 shrink-0 transition-colors">⚡ Wereng Coklat</button>
+            <button onclick="triggerQuickAi('Hidroponik NFT')" class="text-[10px] bg-indigo-950 hover:bg-indigo-900 text-indigo-300 font-extrabold px-3 py-2 rounded-xl border border-indigo-800/30 shrink-0 transition-colors">⚡ Hidroponik NFT</button>
+            <button onclick="triggerQuickAi('Silabus Pemupukan')" class="text-[10px] bg-indigo-950 hover:bg-indigo-900 text-indigo-300 font-extrabold px-3 py-2 rounded-xl border border-indigo-800/30 shrink-0 transition-colors">⚡ Silabus Pemupukan</button>
+          </div>
+
+          <!-- Input Footer -->
+          <form onsubmit="handleSendAi(event)" class="p-4 bg-neutral-900 border-t border-neutral-800 flex gap-2">
+            <input type="text" id="ai-input-field" placeholder="Tanyakan materi agronomi, hama penyakit, pembuatan modul, atau soal ujian..." class="flex-1 bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 placeholder-neutral-500">
+            <button type="submit" class="px-5 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-neutral-950 flex items-center justify-center transition-colors font-bold text-xs gap-1.5">
+              <i data-lucide="send" class="w-4 h-4 text-white"></i> Kirim
+            </button>
+          </form>
+        </div>
+      `;
+      // Auto Scroll to Bottom
+      const chatEnd = document.getElementById('chat-end');
+      if (chatEnd) chatEnd.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // 12. KONTAK VIEW
+    function renderContact(target) {
+      target.innerHTML = `
+        <div class="space-y-6 animate-fade-in">
+          <div>
+            <h3 class="text-2xl font-black text-neutral-100">Hubungi Pengurus Jurusan</h3>
+            <p class="text-sm text-neutral-400 mt-1">Layanan aduan, kerja sama industri, dan pendaftaran siswa baru.</p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-neutral-950 p-6 rounded-2xl border border-neutral-800 space-y-4">
+              <div class="flex gap-4 items-start animate-fade-in">
+                <i data-lucide="map-pin" class="w-5 h-5 text-emerald-400 mt-1 shrink-0"></i>
+                <div>
+                  <h4 class="font-bold text-white text-base">Alamat Lengkap</h4>
+                  <p class="text-xs text-neutral-400 mt-1 leading-relaxed">
+                    Jl. Raya Labangka, Desa Labangka, Kecamatan Labangka, Kabupaten Sumbawa, Nusa Tenggara Barat, Kode Pos 84374.
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex gap-4 items-start animate-fade-in">
+                <i data-lucide="phone" class="w-5 h-5 text-emerald-400 mt-1 shrink-0"></i>
+                <div>
+                  <h4 class="font-bold text-white text-base">Kontak WhatsApp Jurusan</h4>
+                  <p onclick="triggerAlert('Mengalihkan WhatsApp', 'Membuka chat whatsapp administrator...')" class="text-xs text-neutral-400 mt-1 hover:text-emerald-400 cursor-pointer">+62 85205340771</p>
+                </div>
+              </div>
+
+              <div class="flex gap-4 items-start animate-fade-in">
+                <i data-lucide="mail" class="w-5 h-5 text-emerald-400 mt-1 shrink-0"></i>
+                <div>
+                  <h4 class="font-bold text-white text-base">Email Resmi Jurusan</h4>
+                  <p class="text-xs text-neutral-400 mt-1">atph.smkn1labangka@sch.id</p>
+                </div>
+              </div>
+
+              <div class="flex gap-4 items-start animate-fade-in">
+                <i data-lucide="smartphone" class="w-5 h-5 text-emerald-400 mt-1 shrink-0"></i>
+                <div>
+                  <h4 class="font-bold text-white text-base">Situs Resmi Sekolah</h4>
+                  <p onclick="triggerAlert('Mengunjungi Web', 'Membuka www.smkn1labangka.sch.id...')" class="text-xs text-neutral-400 mt-1 text-emerald-400 hover:underline cursor-pointer">www.smkn1labangka.sch.id</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Simulated Map -->
+            <div class="bg-neutral-950 rounded-2xl overflow-hidden border border-neutral-800 animate-fade-in">
+              <div class="bg-neutral-900 px-5 py-3 border-b border-neutral-800 flex justify-between items-center text-xs">
+                <span class="font-bold uppercase tracking-wider">Lokasi Google Maps</span>
+                <span class="text-[10px] text-neutral-500">Sumbawa NTB</span>
+              </div>
+              <div class="h-60 bg-neutral-900 flex items-center justify-center p-4 text-center text-neutral-400">
+                <div>
+                  <span class="text-5xl">🗺️</span>
+                  <p class="font-extrabold text-white mt-3 text-lg">SMK Negeri 1 Labangka Maps</p>
+                  <p class="text-xs text-neutral-500 max-w-sm mt-1 mx-auto leading-relaxed">
+                    Satelit menargetkan koordinat Sekaokat Kec. Labangka Sumbawa NTB.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // ============================================
+    // FORMS ENGINE (ADD / EDIT OPERATIONALS)
+    // ============================================
+
+    // Temporary storage for photo uploads in forms
+    let uploadedPhotoBase64 = "";
+
+    function openFormModal(type, mode, itemId = null) {
+      const modal = document.getElementById('form-modal');
+      const title = document.getElementById('form-title');
+      const fieldsContainer = document.getElementById('form-fields-container');
+      
+      state.formType = type;
+      state.formMode = mode;
+      state.selectedItemId = itemId;
+      uploadedPhotoBase64 = ""; // Reset temporary photo
+
+      const item = itemId ? state[type === 'news' ? 'news' : type + 's'].find(i => i.id === itemId) : {};
+
+      title.innerText = `${mode === 'add' ? 'Tambah' : 'Perbarui'} ${type === 'news' ? 'Berita Sekolah' : type.toUpperCase()}`;
+      modal.classList.remove('hidden');
+
+      // Populate input HTML depending on the type
+      let fieldsHTML = '';
+
+      if (type === 'student') {
+        fieldsHTML = `
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-neutral-400 font-bold mb-1">NISN</label>
+              <input type="text" id="form-nisn" required value="${item.nisn || ''}" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+            </div>
+            <div>
+              <label class="block text-neutral-400 font-bold mb-1">Nama Lengkap</label>
+              <input type="text" id="form-nama" required value="${item.nama || ''}" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-neutral-400 font-bold mb-1">Jenis Kelamin</label>
+              <select id="form-jk" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+                <option value="Laki-laki" ${item.jk === 'Laki-laki' ? 'selected' : ''}>Laki-laki</option>
+                <option value="Perempuan" ${item.jk === 'Perempuan' ? 'selected' : ''}>Perempuan</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-neutral-400 font-bold mb-1">Kelas</label>
+              <select id="form-kelas" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+                <option value="X ATPH" ${item.kelas === 'X ATPH' ? 'selected' : ''}>X ATPH</option>
+                <option value="XI ATPH" ${item.kelas === 'XI ATPH' ? 'selected' : ''}>XI ATPH</option>
+                <option value="XII ATPH" ${item.kelas === 'XII ATPH' ? 'selected' : ''}>XII ATPH</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-neutral-400 font-bold mb-1">Orang Tua / Wali</label>
+              <input type="text" id="form-ortu" value="${item.ortu || ''}" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+            </div>
+            <div>
+              <label class="block text-neutral-400 font-bold mb-1">No. HP Aktif</label>
+              <input type="text" id="form-hp" value="${item.hp || ''}" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+            </div>
+          </div>
+          <div>
+            <label class="block text-neutral-400 font-bold mb-1">Tempat & Tanggal Lahir</label>
+            <input type="text" id="form-ttl" value="${item.ttl || ''}" placeholder="Labangka, 12 Maret 2008" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+          </div>
+          <div>
+            <label class="block text-neutral-400 font-bold mb-1">Alamat Domisili</label>
+            <input type="text" id="form-alamat" value="${item.alamat || ''}" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+          </div>
+          <!-- PHOTO UPLOAD -->
+          <div class="bg-neutral-950 p-4 rounded-xl border border-neutral-800">
+            <label class="block text-neutral-300 font-bold mb-2">Unggah Foto Resmi Siswa</label>
+            <div class="flex items-center gap-4">
+              <div id="photo-preview-box" class="w-16 h-20 rounded-lg bg-neutral-900 border-2 border-dashed border-neutral-800 flex items-center justify-center text-neutral-600 overflow-hidden">
+                ${item.foto ? `<img src="${item.foto}" class="w-full h-full object-cover">` : '<i data-lucide="image" class="w-6 h-6"></i>'}
+              </div>
+              <div class="flex-1">
+                <input type="file" id="form-photo-input" accept="image/*" onchange="processBase64Photo(event)" class="hidden">
+                <label htmlFor="form-photo-input" onclick="document.getElementById('form-photo-input').click()" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-xl cursor-pointer transition-all inline-flex items-center gap-2 text-xs">
+                  <i data-lucide="upload" class="w-3.5 h-3.5"></i> Pilih Gambar
+                </label>
+                <p class="text-[10px] text-neutral-500 mt-1.5">Format: JPEG/PNG. Maksimal 2MB.</p>
+              </div>
+            </div>
+          </div>
+        `;
+        uploadedPhotoBase64 = item.foto || "";
+      }
+
+      else if (type === 'teacher') {
+        fieldsHTML = `
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-neutral-400 font-bold mb-1">NIP Pengajar</label>
+              <input type="text" id="form-nip" required value="${item.nip || ''}" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+            </div>
+            <div>
+              <label class="block text-neutral-400 font-bold mb-1">Nama Lengkap & Gelar</label>
+              <input type="text" id="form-nama" required value="${item.nama || ''}" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+            </div>
+          </div>
+          <div>
+            <label class="block text-neutral-400 font-bold mb-1">Mata Pelajaran Produktif</label>
+            <input type="text" id="form-mapel" required value="${item.mapel || ''}" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+          </div>
+          <div>
+            <label class="block text-neutral-400 font-bold mb-1">Pendidikan Terakhir</label>
+            <input type="text" id="form-pendidikan" value="${item.pendidikan || ''}" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-neutral-400 font-bold mb-1">Surel (Email)</label>
+              <input type="email" id="form-email" value="${item.email || ''}" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+            </div>
+            <div>
+              <label class="block text-neutral-400 font-bold mb-1">No. HP / WhatsApp</label>
+              <input type="text" id="form-hp" value="${item.hp || ''}" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+            </div>
+          </div>
+          <!-- PHOTO UPLOAD -->
+          <div class="bg-neutral-950 p-4 rounded-xl border border-neutral-800">
+            <label class="block text-neutral-300 font-bold mb-2">Unggah Foto Resmi Guru</label>
+            <div class="flex items-center gap-4">
+              <div id="photo-preview-box" class="w-16 h-20 rounded-lg bg-neutral-900 border-2 border-dashed border-neutral-800 flex items-center justify-center text-neutral-600 overflow-hidden">
+                ${item.foto ? `<img src="${item.foto}" class="w-full h-full object-cover">` : '<i data-lucide="image" class="w-6 h-6"></i>'}
+              </div>
+              <div class="flex-1">
+                <input type="file" id="form-photo-input" accept="image/*" onchange="processBase64Photo(event)" class="hidden">
+                <label onclick="document.getElementById('form-photo-input').click()" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-xl cursor-pointer transition-all inline-flex items-center gap-2 text-xs">
+                  <i data-lucide="upload" class="w-3.5 h-3.5"></i> Pilih Gambar
+                </label>
+                <p class="text-[10px] text-neutral-500 mt-1.5">Format: JPEG/PNG. Maksimal 2MB.</p>
+              </div>
+            </div>
+          </div>
+        `;
+        uploadedPhotoBase64 = item.foto || "";
+      }
+
+      else if (type === 'schedule') {
+        fieldsHTML = `
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-neutral-400 font-bold mb-1">Hari</label>
+              <select id="form-hari" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+                <option value="Senin" ${item.hari === 'Senin' ? 'selected' : ''}>Senin</option>
+                <option value="Selasa" ${item.hari === 'Selasa' ? 'selected' : ''}>Selasa</option>
+                <option value="Rabu" ${item.hari === 'Rabu' ? 'selected' : ''}>Rabu</option>
+                <option value="Kamis" ${item.hari === 'Kamis' ? 'selected' : ''}>Kamis</option>
+                <option value="Jumat" ${item.hari === 'Jumat' ? 'selected' : ''}>Jumat</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-neutral-400 font-bold mb-1">Kelas</label>
+              <select id="form-kelas" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+                <option value="X ATPH" ${item.kelas === 'X ATPH' ? 'selected' : ''}>X ATPH</option>
+                <option value="XI ATPH" ${item.kelas === 'XI ATPH' ? 'selected' : ''}>XI ATPH</option>
+                <option value="XII ATPH" ${item.kelas === 'XII ATPH' ? 'selected' : ''}>XII ATPH</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-neutral-400 font-bold mb-1">Mata Pelajaran</label>
+            <input type="text" id="form-mapel" required value="${item.mapel || ''}" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+          </div>
+          <div>
+            <label class="block text-neutral-400 font-bold mb-1">Guru Pengampu</label>
+            <input type="text" id="form-guru" required value="${item.guru || ''}" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+          </div>
+          <div>
+            <label class="block text-neutral-400 font-bold mb-1">Jam Belajar</label>
+            <input type="text" id="form-jam" required placeholder="07.30 - 10.30" value="${item.jam || ''}" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+          </div>
+        `;
+      }
+
+      else if (type === 'activity') {
+        fieldsHTML = `
+          <div>
+            <label class="block text-neutral-400 font-bold mb-1">Judul Jurnal Kegiatan</label>
+            <input type="text" id="form-judul" required placeholder="Praktik Pembiakan Cabai" value="${item.judul || ''}" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-neutral-400 font-bold mb-1">Tanggal Kegiatan</label>
+              <input type="date" id="form-tanggal" required value="${item.tanggal || ''}" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white text-xs">
+            </div>
+            <div>
+              <label class="block text-neutral-400 font-bold mb-1">Lokasi Lahan</label>
+              <input type="text" id="form-lokasi" required placeholder="Greenhouse" value="${item.lokasi || ''}" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+            </div>
+          </div>
+          <div>
+            <label class="block text-neutral-400 font-bold mb-1">Penanggung Jawab / Ketua Kelompok</label>
+            <input type="text" id="form-pj" required placeholder="Ahmad" value="${item.pj || ''}" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+          </div>
+          <div>
+            <label class="block text-neutral-400 font-bold mb-1">Uraian / Deskripsi Kegiatan</label>
+            <textarea id="form-deskripsi" rows="4" placeholder="Uraikan langkah kerja di lapangan..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">${item.deskripsi || ''}</textarea>
+          </div>
+          <!-- PHOTO UPLOAD -->
+          <div class="bg-neutral-950 p-4 rounded-xl border border-neutral-800">
+            <label class="block text-neutral-300 font-bold mb-2">Unggah Foto Dokumentasi Praktik</label>
+            <div class="flex items-center gap-4">
+              <div id="photo-preview-box" class="w-24 h-16 rounded-lg bg-neutral-900 border-2 border-dashed border-neutral-800 flex items-center justify-center text-neutral-600 overflow-hidden">
+                ${item.foto ? `<img src="${item.foto}" class="w-full h-full object-cover">` : '<i data-lucide="image" class="w-6 h-6"></i>'}
+              </div>
+              <div class="flex-1">
+                <input type="file" id="form-photo-input" accept="image/*" onchange="processBase64Photo(event)" class="hidden">
+                <label onclick="document.getElementById('form-photo-input').click()" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-xl cursor-pointer transition-all inline-flex items-center gap-2 text-xs">
+                  <i data-lucide="upload" class="w-3.5 h-3.5"></i> Pilih Gambar
+                </label>
+                <p class="text-[10px] text-neutral-500 mt-1.5">Format: JPEG/PNG. Maksimal 2MB.</p>
+              </div>
+            </div>
+          </div>
+        `;
+        uploadedPhotoBase64 = item.foto || "";
+      }
+
+      else if (type === 'gallery') {
+        fieldsHTML = `
+          <div>
+            <label class="block text-neutral-400 font-bold mb-1">Judul Foto Dokumentasi</label>
+            <input type="text" id="form-judul" required placeholder="Panen melon hidroponik" value="${item.judul || ''}" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-neutral-400 font-bold mb-1">Kategori</label>
+              <select id="form-kategori" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+                <option value="Budidaya" ${item.kategori === 'Budidaya' ? 'selected' : ''}>Budidaya</option>
+                <option value="Pembibitan" ${item.kategori === 'Pembibitan' ? 'selected' : ''}>Pembibitan</option>
+                <option value="Panen" ${item.kategori === 'Panen' ? 'selected' : ''}>Panen</option>
+                <option value="Pertamanan" ${item.kategori === 'Pertamanan' ? 'selected' : ''}>Pertamanan</option>
+                <option value="Kunjungan Industri" ${item.kategori === 'Kunjungan Industri' ? 'selected' : ''}>Kunjungan Industri</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-neutral-400 font-bold mb-1">Tanggal</label>
+              <input type="date" id="form-tanggal" required value="${item.tanggal || ''}" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white text-xs">
+            </div>
+          </div>
+          <!-- PHOTO UPLOAD -->
+          <div class="bg-neutral-950 p-4 rounded-xl border border-neutral-800">
+            <label class="block text-neutral-300 font-bold mb-2">Unggah Foto Galeri</label>
+            <div class="flex items-center gap-4">
+              <div id="photo-preview-box" class="w-24 h-16 rounded-lg bg-neutral-900 border-2 border-dashed border-neutral-800 flex items-center justify-center text-neutral-600 overflow-hidden">
+                ${item.foto ? `<img src="${item.foto}" class="w-full h-full object-cover">` : '<i data-lucide="image" class="w-6 h-6"></i>'}
+              </div>
+              <div class="flex-1">
+                <input type="file" id="form-photo-input" accept="image/*" onchange="processBase64Photo(event)" class="hidden">
+                <label onclick="document.getElementById('form-photo-input').click()" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-xl cursor-pointer transition-all inline-flex items-center gap-2 text-xs">
+                  <i data-lucide="upload" class="w-3.5 h-3.5"></i> Pilih Gambar
+                </label>
+                <p class="text-[10px] text-neutral-500 mt-1.5">Format: JPEG/PNG. Maksimal 2MB.</p>
+              </div>
+            </div>
+          </div>
+        `;
+        uploadedPhotoBase64 = item.foto || "";
+      }
+
+      else if (type === 'news') {
+        fieldsHTML = `
+          <div>
+            <label class="block text-neutral-400 font-bold mb-1">Judul Berita</label>
+            <input type="text" id="form-judul" required placeholder="Penyemprotan hama terpadu" value="${item.judul || ''}" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+          </div>
+          <div>
+            <label class="block text-neutral-400 font-bold mb-1">Tanggal Terbit</label>
+            <input type="date" id="form-tanggal" required value="${item.tanggal || ''}" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white text-xs">
+          </div>
+          <div>
+            <label class="block text-neutral-400 font-bold mb-1">Isi Konten Berita</label>
+            <textarea id="form-isi" rows="5" required placeholder="Tuliskan isi berita sekolah secara mendalam..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">${item.isi || ''}</textarea>
+          </div>
+          <div>
+            <label class="block text-neutral-400 font-bold mb-1">Nama Lampiran Dokumen (Opsional)</label>
+            <input type="text" id="form-lampiran" placeholder="panduan_pkl.pdf" value="${item.lampiran || ''}" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-2.5 text-white">
+          </div>
+          <!-- PHOTO UPLOAD -->
+          <div class="bg-neutral-950 p-4 rounded-xl border border-neutral-800">
+            <label class="block text-neutral-300 font-bold mb-2">Unggah Foto Liputan Berita</label>
+            <div class="flex items-center gap-4">
+              <div id="photo-preview-box" class="w-24 h-16 rounded-lg bg-neutral-900 border-2 border-dashed border-neutral-800 flex items-center justify-center text-neutral-600 overflow-hidden">
+                ${item.foto ? `<img src="${item.foto}" class="w-full h-full object-cover">` : '<i data-lucide="image" class="w-6 h-6"></i>'}
+              </div>
+              <div class="flex-1">
+                <input type="file" id="form-photo-input" accept="image/*" onchange="processBase64Photo(event)" class="hidden">
+                <label onclick="document.getElementById('form-photo-input').click()" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-xl cursor-pointer transition-all inline-flex items-center gap-2 text-xs">
+                  <i data-lucide="upload" class="w-3.5 h-3.5"></i> Pilih Gambar
+                </label>
+                <p class="text-[10px] text-neutral-500 mt-1.5">Format: JPEG/PNG. Maksimal 2MB.</p>
+              </div>
+            </div>
+          </div>
+        `;
+        uploadedPhotoBase64 = item.foto || "";
+      }
+
+      fieldsContainer.innerHTML = fieldsHTML;
+      lucide.createIcons();
+    }
+
+    function closeFormModal() {
+      document.getElementById('form-modal').classList.add('hidden');
+    }
+
+    function processBase64Photo(event) {
+      const file = event.target.files[0];
+      if (file) {
+        if (file.size > 2 * 1024 * 1024) {
+          triggerAlert("Gagal Unggah", "Ukuran foto maksimal adalah 2MB!");
+          return;
+        }
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          uploadedPhotoBase64 = reader.result;
+          const previewBox = document.getElementById('photo-preview-box');
+          previewBox.innerHTML = `<img src="${uploadedPhotoBase64}" class="w-full h-full object-cover">`;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function handleFormSubmit(event) {
+      event.preventDefault();
+      
+      const type = state.formType;
+      const mode = state.formMode;
+      const itemId = state.selectedItemId;
+
+      let listName = type === 'news' ? 'news' : type + 's';
+      let payload = { id: mode === 'add' ? `custom_${Date.now()}` : itemId };
+
+      if (type === 'student') {
+        payload.nisn = document.getElementById('form-nisn').value;
+        payload.nama = document.getElementById('form-nama').value;
+        payload.jk = document.getElementById('form-jk').value;
+        payload.kelas = document.getElementById('form-kelas').value;
+        payload.ortu = document.getElementById('form-ortu').value;
+        payload.hp = document.getElementById('form-hp').value;
+        payload.ttl = document.getElementById('form-ttl').value;
+        payload.alamat = document.getElementById('form-alamat').value;
+        payload.foto = uploadedPhotoBase64 || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=120";
+
+        if (mode === 'add' && state.students.length >= 100) {
+          triggerAlert("Batas Terpenuhi", "Jumlah maksimal 100 siswa telah tercapai.");
+          return;
+        }
+      }
+
+      else if (type === 'teacher') {
+        payload.nip = document.getElementById('form-nip').value;
+        payload.nama = document.getElementById('form-nama').value;
+        payload.mapel = document.getElementById('form-mapel').value;
+        payload.pendidikan = document.getElementById('form-pendidikan').value;
+        payload.email = document.getElementById('form-email').value;
+        payload.hp = document.getElementById('form-hp').value;
+        payload.foto = uploadedPhotoBase64 || "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=150";
+      }
+
+      else if (type === 'schedule') {
+        payload.hari = document.getElementById('form-hari').value;
+        payload.kelas = document.getElementById('form-kelas').value;
+        payload.mapel = document.getElementById('form-mapel').value;
+        payload.guru = document.getElementById('form-guru').value;
+        payload.jam = document.getElementById('form-jam').value;
+      }
+
+      else if (type === 'activity') {
+        payload.judul = document.getElementById('form-judul').value;
+        payload.tanggal = document.getElementById('form-tanggal').value;
+        payload.lokasi = document.getElementById('form-lokasi').value;
+        payload.pj = document.getElementById('form-pj').value;
+        payload.deskripsi = document.getElementById('form-deskripsi').value;
+        payload.foto = uploadedPhotoBase64 || "https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&q=80&w=400";
+        payload.status = state.isAdmin ? 'Disetujui' : 'Menunggu Persetujuan';
+      }
+
+      else if (type === 'gallery') {
+        payload.judul = document.getElementById('form-judul').value;
+        payload.kategori = document.getElementById('form-kategori').value;
+        payload.tanggal = document.getElementById('form-tanggal').value;
+        payload.foto = uploadedPhotoBase64 || "https://images.unsplash.com/photo-1463123081488-729f551ee610?auto=format&fit=crop&q=80&w=400";
+      }
+
+      else if (type === 'news') {
+        payload.judul = document.getElementById('form-judul').value;
+        payload.tanggal = document.getElementById('form-tanggal').value;
+        payload.isi = document.getElementById('form-isi').value;
+        payload.lampiran = document.getElementById('form-lampiran').value;
+        payload.foto = uploadedPhotoBase64 || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=400";
+      }
+
+      // Perform local updates/saves
+      if (mode === 'add') {
+        state[listName].push(payload);
+      } else {
+        state[listName] = state[listName].map(item => item.id === itemId ? payload : item);
+      }
+
+      closeFormModal();
+      triggerAlert("Berhasil Disimpan", `Data ${type} sukses disimpan ke memori.`);
+      renderActiveTab();
+    }
+
+    function executeDelete(type, id) {
+      triggerConfirm(
+        "Hapus Data Permanen?",
+        "Tindakan ini tidak bisa dibatalkan secara otomatis. Lanjutkan?",
+        () => {
+          let listName = type === 'news' ? 'news' : type + 's';
+          state[listName] = state[listName].filter(item => item.id !== id);
+          triggerAlert("Sukses Terhapus", "Data berhasil dihilangkan.");
+          renderActiveTab();
+        }
+      );
+    }
+
+    function approveActivity(id, status) {
+      state.activities = state.activities.map(ac => ac.id === id ? { ...ac, status } : ac);
+      triggerAlert("Verifikasi Selesai", `Status kegiatan sukses diperbarui menjadi: ${status}`);
+      renderActiveTab();
+    }
+
+    // --- SEARCH FIELD CONTROLLER ---
+    function handleSearch(event) {
+      state.searchQuery = event.target.value;
+      // Partial update to avoid losing input focus
+      const workspace = document.getElementById('workspace');
+      if (state.currentTab === 'students') {
+        renderStudents(workspace);
+      } else if (state.currentTab === 'teachers') {
+        renderTeachers(workspace);
+      }
+      // Keep cursor focused by retrieving the updated search field
+      const searchBox = document.querySelector('input[type="text"]');
+      if (searchBox) {
+        searchBox.focus();
+        searchBox.setSelectionRange(searchBox.value.length, searchBox.value.length);
+      }
+      lucide.createIcons();
+    }
+
+    // ============================================
+    // EXPORT SHEET SIMULATION SYSTEM
+    // ============================================
+    function openExportPreview(type) {
+      const modal = document.getElementById('export-modal');
+      const title = document.getElementById('export-doc-title');
+      const container = document.getElementById('export-sheet-container');
+
+      state.exportType = type;
+      title.innerText = `Ekspor Data ${type === 'student' ? 'Siswa' : 'Guru produktif'}`;
+
+      let tableHTML = '';
+      if (type === 'student') {
+        tableHTML = `
+          <table class="w-full text-left border-collapse border border-neutral-400 font-sans">
+            <thead>
+              <tr class="bg-neutral-200 border-b border-neutral-400">
+                <th class="p-2 border-r border-neutral-400">NISN</th>
+                <th class="p-2 border-r border-neutral-400">NAMA LENGKAP</th>
+                <th class="p-2 border-r border-neutral-400">KELAS</th>
+                <th class="p-2 border-r border-neutral-400">ALAMAT</th>
+                <th class="p-2">ORANG TUA</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${state.students.map(s => `
+                <tr class="border-b border-neutral-300">
+                  <td class="p-2 border-r border-neutral-300 font-mono">${s.nisn}</td>
+                  <td class="p-2 border-r border-neutral-300 font-bold">${s.nama}</td>
+                  <td class="p-2 border-r border-neutral-300">${s.kelas}</td>
+                  <td class="p-2 border-r border-neutral-300">${s.alamat}</td>
+                  <td class="p-2">${s.ortu}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } else {
+        tableHTML = `
+          <table class="w-full text-left border-collapse border border-neutral-400 font-sans">
+            <thead>
+              <tr class="bg-neutral-200 border-b border-neutral-400">
+                <th class="p-2 border-r border-neutral-400">NIP</th>
+                <th class="p-2 border-r border-neutral-400">NAMA GURU</th>
+                <th class="p-2 border-r border-neutral-400">MAPEL PRODUKTIF</th>
+                <th class="p-2">TELEPON</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${state.teachers.map(t => `
+                <tr class="border-b border-neutral-300">
+                  <td class="p-2 border-r border-neutral-300 font-mono">${t.nip}</td>
+                  <td class="p-2 border-r border-neutral-300 font-bold">${t.nama}</td>
+                  <td class="p-2 border-r border-neutral-300">${t.mapel}</td>
+                  <td class="p-2">${t.hp}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      }
+
+      container.innerHTML = `
+        <div class="text-center border-b-2 border-neutral-800 pb-3 mb-4">
+          <h3 class="font-bold text-sm tracking-wide">SMK NEGERI 1 LABANGKA SUMBAWA</h3>
+          <p class="text-[10px] text-neutral-600 font-sans uppercase">Kompetensi Keahlian: Agribisnis Tanaman Pangan dan Hortikultura (ATPH)</p>
+          <p class="text-[8px] text-neutral-500 italic font-sans">Sekaokat, Kec. Labangka, Kab. Sumbawa, NTB, Kode Pos 84374</p>
+        </div>
+        <div class="mb-4 text-[10px] font-sans">
+          <p><strong>Laporan:</strong> Database Rekapitulasi ATPH Digital</p>
+          <p><strong>Tanggal Cetak:</strong> ${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+        </div>
+        ${tableHTML}
+      `;
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeExportModal() {
+      document.getElementById('export-modal').classList.add('hidden');
+    }
+
+    function simulateExport(format) {
+      closeExportModal();
+      triggerAlert("Ekspor Sukses", `Format berkas laporan ${format} berhasil diproses dan disimpan ke folder unduhan.`);
+    }
+
+    // ============================================
+    // GALLERY SLIDESHOW SYSTEM
+    // ============================================
+    function openSlideshow(index) {
+      const filtered = state.gallery.filter(g => state.galleryCategory === 'Semua' || g.kategori === state.galleryCategory);
+      slideshowIndex = index;
+      const modal = document.getElementById('slideshow-modal');
+      modal.classList.remove('hidden');
+      updateSlideshowView(filtered);
+    }
+
+    function updateSlideshowView(list) {
+      const item = list[slideshowIndex];
+      document.getElementById('slideshow-counter').innerText = `Pratinjau Slide (${slideshowIndex + 1} / ${list.length})`;
+      document.getElementById('slideshow-img').src = item.foto;
+      document.getElementById('slideshow-category').innerText = item.kategori;
+      document.getElementById('slideshow-title').innerText = item.judul;
+      document.getElementById('slideshow-date').innerText = `Tanggal: ${item.tanggal}`;
+
+      document.getElementById('prev-slide-btn').disabled = slideshowIndex === 0;
+      document.getElementById('next-slide-btn').disabled = slideshowIndex === list.length - 1;
+    }
+
+    function navigateSlide(direction) {
+      const filtered = state.gallery.filter(g => state.galleryCategory === 'Semua' || g.kategori === state.galleryCategory);
+      slideshowIndex += direction;
+      if (slideshowIndex >= 0 && slideshowIndex < filtered.length) {
+        updateSlideshowView(filtered);
+      }
+    }
+
+    function closeSlideshow() {
+      document.getElementById('slideshow-modal').classList.add('hidden');
+    }
+
+    // ============================================
+    // AI CHAT INTELLIGENCE ENGINE (GEMINI CONNECTOR)
+    // ============================================
+    function resetAiChat() {
+      state.aiMessages = [state.aiMessages[0]];
+      renderActiveTab();
+    }
+
+    function triggerQuickAi(actionKey) {
+      let promptText = "";
+      switch (actionKey) {
+        case "Buat 5 Soal PG":
+          promptText = "Buatkan saya 5 soal pilihan ganda tentang budidaya hortikultura lengkap dengan opsi jawaban dan kunci jawabannya.";
+          break;
+        case "Wereng Coklat":
+          promptText = "Jelaskan apa itu hama wereng batang coklat, bagaimana siklus hidupnya, dan cara penangannya secara hayati.";
+          break;
+        case "Hidroponik NFT":
+          promptText = "Jelaskan kelebihan dan kekurangan sistem hidroponik NFT (Nutrient Film Technique) untuk pemula.";
+          break;
+        case "Silabus Pemupukan":
+          promptText = "Buatkan draft silabus modul ajar singkat bertema Pemupukan Berimbang Tanaman Pangan kelas XI SMK.";
+          break;
+      }
+      executeAiChatQuery(promptText);
+    }
+
+    function handleSendAi(event) {
+      event.preventDefault();
+      const input = document.getElementById('ai-input-field');
+      const text = input.value;
+      if (!text.trim()) return;
+
+      executeAiChatQuery(text);
+    }
+
+    async function executeAiChatQuery(text) {
+      const userMessage = { id: `u_${Date.now()}`, role: 'user', text: text, timestamp: new Date() };
+      state.aiMessages.push(userMessage);
+      state.aiLoading = true;
+      renderActiveTab();
+
+      const apiKey = ""; // Runtime Injected key
+      const systemPrompt = `Anda adalah "Asisten AI ATPH Digital", sistem kecerdasan buatan cerdas khusus untuk Jurusan Agribisnis Tanaman Pangan dan Hortikultura (ATPH) SMKN 1 Labangka, Nusa Tenggara Barat.
+Tugas Anda adalah:
+1. Membantu siswa dalam belajar agronomi, hortikultura, pembibitan, teknik pemupukan, pengendalian hama terpadu, dan arsitektur lanskap.
+2. Membantu membuat soal-soal latihan (baik Pilihan Ganda dengan kunci jawaban, maupun Essay dengan pembahasan) jika diminta.
+3. Memberikan penjelasan taktis cara budidaya komoditas pertanian unggulan Sumbawa seperti jagung, cabai rawit, melon, padi, bawang merah, dll.
+4. Menjawab dengan bahasa yang sopan, ramah, menginspirasi, edukatif, dan ramah generasi muda. Gunakan format Markdown yang rapi (bold, list, sub-heading) dalam bahasa Indonesia yang baik.`;
+
+      let aiReply = "Maaf, koneksi ke sistem kecerdasan buatan sedang terputus. Mohon periksa kembali jaringan internet Anda.";
+      
+      // Exponential Backoff Fetch
+      let retries = 5;
+      let delay = 1000;
+      let success = false;
+
+      while (retries > 0 && !success) {
+        try {
+          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: text }] }],
+              systemInstruction: { parts: [{ text: systemPrompt }] }
+            })
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            const retrievedText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (retrievedText) {
+              aiReply = retrievedText;
+              success = true;
+            }
+          }
+        } catch (err) {
+          console.warn("Retrying AI call due to error...", err);
+        }
+
+        if (!success) {
+          retries--;
+          await new Promise(resolve => setTimeout(resolve, delay));
+          delay *= 2; // exponential backing
+        }
+      }
+
+      const aiMessage = { id: `ai_${Date.now()}`, role: 'assistant', text: aiReply, timestamp: new Date() };
+      state.aiMessages.push(aiMessage);
+      state.aiLoading = false;
+      renderActiveTab();
+    }
+
+    // --- APPLICATION BOOTSTRAPPER ---
+    window.onload = function () {
+      initializeSidebarMenus();
+      switchTab('dashboard'); // Set default tab
+    };
+  </script>
+</body>
+</html>
